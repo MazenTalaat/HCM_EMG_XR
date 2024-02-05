@@ -19,6 +19,7 @@ public class ServerController : MonoBehaviour
     private List<int> emg1;
     private string serverIP;
     private short serverPort;
+    private GameObject emgLine;
 
     // Start is called before the first frame update
     void Start()
@@ -60,39 +61,6 @@ public class ServerController : MonoBehaviour
         {
             serverCylinder.SetActive(!serverCylinder.activeSelf);
         }
-
-
-        if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
-        {
-            print(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values.Length);
-            print(RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values));
-            
-            //foreach(var v in RTClient.GetInstance().AnalogChannels[0].Values)
-            //{
-            //    print(v);
-            //}
-
-        }
-    }
-
-    float RMSCalculation(float[] arr)
-    {
-        int square = 0;
-        float mean, root = 0;
-
-        // Calculate square
-        for (int i = 0; i < arr.Length; i++)
-        {
-            square += (int)Math.Pow(arr[i], 2);
-        }
-
-        // Calculate Mean
-        mean = (square / (float)(arr.Length));
-
-        // Calculate Root
-        root = (float)Math.Sqrt(mean);
-
-        return root;
     }
 
 public void ConnectOnClick()
