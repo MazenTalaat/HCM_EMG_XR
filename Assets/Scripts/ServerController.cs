@@ -6,12 +6,15 @@ using QTMRealTimeSDK;
 using TMPro;
 using Oculus.Interaction;
 using UnityEngine.UI;
+using System;
 
 public class ServerController : MonoBehaviour
 {
     public GameObject toggleButtonPrefab;
     public GameObject scrollViewContent;
+    public GameObject serverCylinder;
     public TextMeshProUGUI statusText;
+    public List<Button> serverButtons;
     private List<DiscoveryResponse> discoveryResponses;
     private List<int> emg1;
     private string serverIP;
@@ -21,14 +24,13 @@ public class ServerController : MonoBehaviour
     void Start()
     {
         UpdateServers();
+        serverButtons[0].interactable = true;
+        serverButtons[1].interactable = true;
+        serverButtons[2].interactable = false;
     }
 
     public void UpdateServers()
     {
-        if (RTClient.GetInstance().ConnectionState != RTConnectionState.Connected)
-        {
-            statusText.color = Color.white;
-        }
         for (int i=0; i<scrollViewContent.transform.childCount; i++)
         {
             Destroy(scrollViewContent.transform.GetChild(i).gameObject);
@@ -53,9 +55,17 @@ public class ServerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // One -> A, Two -> B, Three -> X, Four -> Y
+        if (OVRInput.GetDown(OVRInput.Button.Start) || Input.GetKeyDown("m"))
+        {
+            serverCylinder.SetActive(!serverCylinder.activeSelf);
+        }
+
+
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
             print(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values.Length);
+            print(RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values));
             
             //foreach(var v in RTClient.GetInstance().AnalogChannels[0].Values)
             //{
@@ -65,7 +75,27 @@ public class ServerController : MonoBehaviour
         }
     }
 
-    public void ConnectOnClick()
+    float RMSCalculation(float[] arr)
+    {
+        int square = 0;
+        float mean, root = 0;
+
+        // Calculate square
+        for (int i = 0; i < arr.Length; i++)
+        {
+            square += (int)Math.Pow(arr[i], 2);
+        }
+
+        // Calculate Mean
+        mean = (square / (float)(arr.Length));
+
+        // Calculate Root
+        root = (float)Math.Sqrt(mean);
+
+        return root;
+    }
+
+public void ConnectOnClick()
     {
         StartCoroutine(Connect());
     }
@@ -79,20 +109,38 @@ public class ServerController : MonoBehaviour
 
         while (RTClient.GetInstance().ConnectionState == RTConnectionState.Connecting)
         {
+            serverButtons[0].interactable = false;
+            serverButtons[1].interactable = false;
             yield return null;
         }
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
-            //SendMessageUpwards("Disable");
+            serverButtons[0].interactable = false;
+            serverButtons[1].interactable = false;
+            serverButtons[2].interactable = true;
+            serverCylinder.SetActive(false);
             statusText.text = "Connected";
             statusText.color = Color.green;
             print("Connected");
         }
         else
         {
+            serverButtons[0].interactable = true;
+            serverButtons[1].interactable = true;
+            serverButtons[2].interactable = false;
             statusText.text = "Could not connect to this server";
             statusText.color = Color.red;
             print("Could not connect to this server");
         }
+    }
+
+    public void DisconnectOnClick()
+    {
+        serverButtons[0].interactable = true;
+        serverButtons[1].interactable = true;
+        serverButtons[2].interactable = false;
+        statusText.text = "Waiting";
+        statusText.color = Color.white;
+        RTClient.GetInstance().Disconnect();
     }
 }
