@@ -7,7 +7,7 @@ namespace QualisysRealTime.Unity
     public class DebugHierarchyRotations : MonoBehaviour
     {
         public Color color = Color.red;
-
+#if UNITY_EDITOR
         [Conditional("UNITY_EDITOR")]
         private void OnDrawGizmos()
         {
@@ -29,5 +29,6 @@ namespace QualisysRealTime.Unity
                 }
             }
         }
+#endif
     }
 }

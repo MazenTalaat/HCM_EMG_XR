@@ -42,6 +42,9 @@ public class ServerController : MonoBehaviour
         {
             var toggleButtonGO = GameObject.Instantiate(toggleButtonPrefab, scrollViewContent.transform);
             toggleButtonGO.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Host name: " + server.HostName + "\nIP: " + server.IpAddress + ":" + server.Port;
+            // print("************************************************");
+            // print("Host name: " + server.HostName + "\nIP: " + server.IpAddress + ":" + server.Port);
+            // print("************************************************");
             toggleButtonGO.GetComponent<ToggleDeselect>().group = scrollViewContent.GetComponent<ToggleGroup>();
             toggleButtonGO.GetComponent<ToggleDeselect>().onValueChanged.AddListener(delegate {
                 if (toggleButtonGO.GetComponent<ToggleDeselect>().isOn)
@@ -70,6 +73,8 @@ public void ConnectOnClick()
 
     IEnumerator Connect()
     {
+        //192.168.0.122 22222
+        //RTClient.GetInstance().StartConnecting("192.168.0.122", 22222, false, true, false, false, true, true, false);
         RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
         statusText.text = "Connecting ...";
         statusText.color = Color.yellow;
