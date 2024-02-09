@@ -180,11 +180,13 @@ public class DD_DataDiagram : MonoBehaviour , IScrollHandler, IDragHandler {
     // 创建一个委托，返回类型为void，两个参数
     public delegate void RectChangeHandler(object sender, DD_RectChangeEventArgs e);
     public delegate void ZoomHandler(object sender, DD_ZoomEventArgs e);
+    public delegate void CalibHandler(float x, float y);
     public delegate void MoveHandler(object sender, DD_MoveEventArgs e);
     public delegate void PreDestroyLineHandler(object sender, DD_PreDestroyLineEventArgs e);
     // 将创建的委托和特定事件关联,在这里特定的事件为KeyDown
     public event RectChangeHandler RectChangeEvent;
     public event ZoomHandler ZoomEvent;
+    public event CalibHandler CalibEvent;
     public event MoveHandler MoveEvent;
     public event PreDestroyLineHandler PreDestroyLineEvent;
 
@@ -283,7 +285,17 @@ public class DD_DataDiagram : MonoBehaviour , IScrollHandler, IDragHandler {
 
     // Update is called once per frame
     void Update () {
+        if (Input.GetKeyDown("z"))
+        {
+            print("Zoom out time");
+            CalibEvent(1f, 0f);
+        }
 
+        if (Input.GetKeyDown("s"))
+        {
+            print("Zoom out y axis");
+            CalibEvent(0f, 1f);
+        }
     }
 
     public void OnDrag(PointerEventData eventData) {

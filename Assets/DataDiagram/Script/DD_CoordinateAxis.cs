@@ -292,6 +292,7 @@ public class DD_CoordinateAxis : DD_DrawGraphic {
         ///添加事件响应
         m_DataDiagram.RectChangeEvent += OnRectChange;
         m_DataDiagram.ZoomEvent += OnZoom;
+        m_DataDiagram.CalibEvent += OnCalib;
         m_DataDiagram.MoveEvent += OnMove;
     }
 
@@ -366,6 +367,12 @@ public class DD_CoordinateAxis : DD_DrawGraphic {
         ChangeScale(e.ZoomX, e.ZoomY);
 
         ///触发OnPopulateMesh的更新
+        UpdateGeometry();
+    }
+
+    private void OnCalib(float x, float y)
+    {
+        ChangeScale(x, y);
         UpdateGeometry();
     }
 
