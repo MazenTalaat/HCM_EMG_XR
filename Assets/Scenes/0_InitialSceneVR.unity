@@ -5243,13 +5243,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 545128507}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2518c50cb3fc6a6458d4b743c2f69c7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
   _useInitialPressPositionForDrag: 1
+  _exclusiveMode: 0
 --- !u!114 &545128509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5287,7 +5288,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 545128507}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
@@ -5898,7 +5899,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2609c54f376cffc4da1ab9401cc1a36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _skeletonType: 0
+  _skeletonType: 4
   _updateRootPose: 0
   _updateRootScale: 1
   _enablePhysicsCapsules: 0
@@ -5918,6 +5919,7 @@ MonoBehaviour:
   HandType: 0
   _pointerPoseRoot: {fileID: 0}
   m_showState: 3
+  RayHelper: {fileID: 0}
 --- !u!1 &626381679
 GameObject:
   m_ObjectHideFlags: 0
@@ -18784,85 +18786,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1609047482}
   m_CullTransparentMesh: 1
---- !u!1001 &1640084788
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.37
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.0032423825
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.99999475
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180.372
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      propertyPath: m_Name
-      value: muscles_colored_full_reduced_rigged_Unity
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1640084790}
-  m_SourcePrefab: {fileID: 100100000, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
---- !u!1 &1640084789 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
-  m_PrefabInstance: {fileID: 1640084788}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1640084790
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1640084789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99961255132c93e40b484d3d403354c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SkeletonName: MT
-  DestinationAvatar: {fileID: 9000000, guid: 61d9cc20ac29de5488ef33c9206fe8bd, type: 3}
 --- !u!1 &1647157917
 GameObject:
   m_ObjectHideFlags: 0
@@ -21454,7 +21377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2609c54f376cffc4da1ab9401cc1a36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _skeletonType: 1
+  _skeletonType: 5
   _updateRootPose: 0
   _updateRootScale: 1
   _enablePhysicsCapsules: 0
@@ -21474,6 +21397,7 @@ MonoBehaviour:
   HandType: 1
   _pointerPoseRoot: {fileID: 0}
   m_showState: 3
+  RayHelper: {fileID: 0}
 --- !u!1 &1897666756
 GameObject:
   m_ObjectHideFlags: 0
@@ -24263,14 +24187,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134119715}
   m_CullTransparentMesh: 1
+--- !u!1001 &811494866945526860
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.445
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.905
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 5977977465497918765, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6466564855632185239, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
+      propertyPath: m_Name
+      value: muscles_full_reduced_shoulder_colored_rigged
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0c0a43e3918f57040a49f7680c5fdb88, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
   - {fileID: 350791154}
-  - {fileID: 1640084788}
   - {fileID: 1652840842}
   - {fileID: 1252632596}
   - {fileID: 545128510}
   - {fileID: 234568918}
+  - {fileID: 811494866945526860}

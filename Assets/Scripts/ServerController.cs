@@ -19,7 +19,6 @@ public class ServerController : MonoBehaviour
     private List<int> emg1;
     private string serverIP;
     private short serverPort;
-    private GameObject emgLine;
 
     // Start is called before the first frame update
     void Start()
@@ -75,7 +74,8 @@ public void ConnectOnClick()
     {
         //192.168.0.122 22222
         //RTClient.GetInstance().StartConnecting("192.168.0.122", 22222, false, true, false, false, true, true, false);
-        RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
+        RTClient.GetInstance().StartConnecting("192.168.1.55", 22222, false, true, false, false, true, true, false);
+        //RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
         statusText.text = "Connecting ...";
         statusText.color = Color.yellow;
         print("Connecting ...");
