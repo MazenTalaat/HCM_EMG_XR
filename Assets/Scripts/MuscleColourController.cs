@@ -7,7 +7,9 @@ public class MuscleColourController : MonoBehaviour
 {
     private List<float> emgData = new List<float>();
     private int counter = 0;
-    private float timeStep = 0.01f;
+    private float timeStep = 0.1f;
+    private int movingWindow = 20;
+
     public GameObject avatar;
 
     /// <summary>
@@ -39,30 +41,36 @@ public class MuscleColourController : MonoBehaviour
     {
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
-            float rmsEmgData = RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values);
-            //print(rmsEmgData);
-            var counter = 0;
-            foreach (var mat in avatar.GetComponent<SkinnedMeshRenderer>().materials)
+            try
             {
-                if (mat.name == "L_Scapular_part_of_deltoid_Pbr (Instance)")
+                float rmsEmgData = RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values);
+                //print(rmsEmgData);
+                var matCounter = 0;
+                foreach (var mat in avatar.GetComponent<SkinnedMeshRenderer>().materials)
                 {
-                    avatar.GetComponent<SkinnedMeshRenderer>().materials[counter].color = new Color(255, 0, 0, rmsEmgData / 500f);
-                    break;
+                    if (mat.name == "L_Scapular_part_of_deltoid_Pbr (Instance)")
+                    {
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color = new Color(255, 0, 0, rmsEmgData / 500f);
+                        break;
+                    }
+                    matCounter++;
                 }
-                counter++;
-            }
-            
 
-            if (counter == 20)
-            {
-                emgData.Add(rmsEmgData);
-                emgData.RemoveAt(0);
+                if (counter == movingWindow)
+                {
+                    emgData.Add(rmsEmgData);
+                    emgData.RemoveAt(0);
+                }
+                else
+                {
+                    counter++;
+                    emgData.Add(rmsEmgData);
+                }
             }
-            else
+            catch (System.Exception)
             {
-                counter++;
-                emgData.Add(rmsEmgData);
-            }
+                print("Couldn't get muscle data");
+            }   
         }
     }
 

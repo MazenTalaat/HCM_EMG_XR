@@ -10,7 +10,8 @@ public class GraphController : MonoBehaviour {
     private DD_DataDiagram m_DataDiagram;
     private List<float> emgData = new List<float>();
     private int counter = 0;
-    private float timeStep = 0.01f;
+    private float timeStep = 0.1f;
+    private int movingWindow = 20;
 
     // Use this for initialization
     void Start () {
@@ -46,20 +47,28 @@ public class GraphController : MonoBehaviour {
 
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
-            float rmsEmgData = RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values);
+            try
+            {
+                float rmsEmgData = RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values);
+
+                if (counter == movingWindow)
+                {
+                    emgData.Add(rmsEmgData);
+                    emgData.RemoveAt(0);
+
+                    m_DataDiagram.InputPoint(lineList[0], new Vector2(timeStep, RMSCalculation(emgData.ToArray())));
+                }
+                else
+                {
+                    counter++;
+                    emgData.Add(rmsEmgData);
+                }
+            }
+            catch (System.Exception)
+            {
+                print("Couldn't get muscle data");
+            }
             
-            if(counter == 20)
-            {
-                emgData.Add(rmsEmgData);
-                emgData.RemoveAt(0);
- 
-                m_DataDiagram.InputPoint(lineList[0], new Vector2(timeStep, RMSCalculation(emgData.ToArray())));
-            }
-            else
-            {
-                counter++;
-                emgData.Add(rmsEmgData);
-            }
         }
     }
 

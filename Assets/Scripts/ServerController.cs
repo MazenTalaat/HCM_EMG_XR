@@ -15,8 +15,9 @@ public class ServerController : MonoBehaviour
     public GameObject serverCylinder;
     public TextMeshProUGUI statusText;
     public List<Button> serverButtons;
+    public GameObject avatar;
     private List<DiscoveryResponse> discoveryResponses;
-    private List<int> emg1;
+
     private string serverIP;
     private short serverPort;
 
@@ -27,6 +28,7 @@ public class ServerController : MonoBehaviour
         serverButtons[0].interactable = true;
         serverButtons[1].interactable = true;
         serverButtons[2].interactable = false;
+        avatar.gameObject.SetActive(false);
     }
 
     public void UpdateServers()
@@ -94,6 +96,7 @@ public void ConnectOnClick()
             serverCylinder.SetActive(false);
             statusText.text = "Connected";
             statusText.color = Color.green;
+            avatar.gameObject.SetActive(true);
             print("Connected");
         }
         else
@@ -114,6 +117,7 @@ public void ConnectOnClick()
         serverButtons[2].interactable = false;
         statusText.text = "Waiting";
         statusText.color = Color.white;
+        avatar.gameObject.SetActive(false);
         RTClient.GetInstance().Disconnect();
     }
 }
