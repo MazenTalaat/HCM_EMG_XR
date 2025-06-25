@@ -28,7 +28,6 @@ public class ServerController : MonoBehaviour
         serverButtons[0].interactable = true;
         serverButtons[1].interactable = true;
         serverButtons[2].interactable = false;
-        avatar.gameObject.SetActive(false);
         ConnectOnClick();
     }
 
@@ -97,7 +96,6 @@ public void ConnectOnClick()
             serverCylinder.SetActive(false);
             statusText.text = "Connected";
             statusText.color = Color.green;
-            avatar.gameObject.SetActive(true);
             print("Connected");
         }
         else

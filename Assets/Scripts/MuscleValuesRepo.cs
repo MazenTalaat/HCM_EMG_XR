@@ -11,7 +11,13 @@ using UnityEngine;
 /// </summary>
 public class MuscleValuesRepo : MonoBehaviour
 {
+    public GameObject graph;
+
+    public bool getMVIC = false;
+
     private static int _channelCount = 6;
+    //{ "R_Deltoid_Anterior", 0 }, //{ "R_Deltoid_Medius", 0 }, //{ "R_Deltoid_Posterior", 0 },
+    //{ "L_Deltoid_Anterior", 0 }, //{ "L_Deltoid_Medius", 0 }, //{ "L_Deltoid_Posterior", 0 }
     private string[] _channelNames = { "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1" };
 
     private int _samplesCollected = 0;
@@ -42,7 +48,12 @@ public class MuscleValuesRepo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        // One -> A, Two -> B, Three -> X, Four -> Y
+        if (OVRInput.GetDown(OVRInput.Button.Four) || Input.GetKeyDown("y"))
+        {
+            graph.SetActive(!graph.activeSelf);
+            getMVIC = !getMVIC;
+        }
     }
     private void GetEmgData()
     {
@@ -73,9 +84,12 @@ public class MuscleValuesRepo : MonoBehaviour
                     }
                 }
 
-                for (int i = 0; i < _channelCount; i++)
+                if (getMVIC == true)
                 {
-                    MVIC[i] = Math.Max(MVIC[i], rmsEmgData[i]);
+                    for (int i = 0; i < _channelCount; i++)
+                    {
+                        MVIC[i] = Math.Max(MVIC[i], rmsEmgData[i]);
+                    }
                 }
 
                 //print("Raw: " + rawEmgData[0].ToString() + " RMS: " + rmsEmgData[0].ToString() + " MVIC: " + MVIC[0].ToString());

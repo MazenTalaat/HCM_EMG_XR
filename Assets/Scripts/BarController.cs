@@ -6,6 +6,15 @@ using UnityEngine;
 public class BarController : MonoBehaviour
 {
     public ProgressBar progressBar;
+    private Dictionary<string, int> _musclesMap = new Dictionary<string, int>
+    {
+        { "R_Deltoid_Anterior", 0 },
+        { "R_Deltoid_Medius", 0 },
+        { "R_Deltoid_Posterior", 0 },
+        { "L_Deltoid_Anterior", 0 },
+        { "L_Deltoid_Medius", 0 },
+        { "L_Deltoid_Posterior", 0 }
+    };
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +32,7 @@ public class BarController : MonoBehaviour
         {
             try
             {
-                progressBar.BarValue = (int)(MuscleValuesRepo.rmsEmgData[0] / MuscleValuesRepo.MVIC[0] * 100);
+                progressBar.BarValue = (int)(MuscleValuesRepo.rmsEmgData[_musclesMap[progressBar.Title]] / MuscleValuesRepo.MVIC[_musclesMap[progressBar.Title]] * 100);
             }
             catch (System.Exception)
             {
