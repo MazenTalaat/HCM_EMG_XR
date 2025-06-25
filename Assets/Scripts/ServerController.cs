@@ -29,6 +29,7 @@ public class ServerController : MonoBehaviour
         serverButtons[1].interactable = true;
         serverButtons[2].interactable = false;
         avatar.gameObject.SetActive(false);
+        ConnectOnClick();
     }
 
     public void UpdateServers()
@@ -74,7 +75,7 @@ public void ConnectOnClick()
 
     IEnumerator Connect()
     {
-        //192.168.0.122 22222
+        // TODO Add here a static IP and make sure that the PC has a static IP too.
         //RTClient.GetInstance().StartConnecting("192.168.0.122", 22222, false, true, false, false, true, true, false);
         RTClient.GetInstance().StartConnecting("192.168.1.55", 22222, false, true, false, false, true, true, false);
         //RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);

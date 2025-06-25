@@ -5,94 +5,83 @@ using UnityEngine;
 
 public class MuscleColourController : MonoBehaviour
 {
-    private List<float> emgData = new List<float>();
-    private int counter = 0;
-    private float timeStep = 0.1f;
-    private int movingWindow = 20;
-
     public GameObject avatar;
-
     /// <summary>
     /// Muscles Material Index
     /// 3 L_Scapular_part_of_deltoid_Pbr
     /// 4 L_Clavicular_part_of_deltoid_Pbr
-    /// 5 L_Clavicular_head_of_pectoralis_Pbr
+    /// XX5 L_Clavicular_head_of_pectoralis_Pbr
     /// 6 L_Acromial_part_of_deltoid_Pbr
     /// 
     /// 10 R_Scapular_part_of_deltoid_Pbr
     /// 11 R_Clavicular_part_of_deltoid_Pbr
-    /// 12 R_Clavicular_head_of_pectoralis_Pbr
+    /// XX12 R_Clavicular_head_of_pectoralis_Pbr
     /// 13 R_Acromial_part_of_deltoid_Pbr
     /// </summary>
 
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("GetEMG_Data", 0.01f, timeStep);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        GetEmgData();
     }
 
-    private void GetEMG_Data()
+    private void GetEmgData()
     {
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
-            try
+            //try
+            //{
+            var matCounter = 0;
+            foreach (var mat in avatar.GetComponent<SkinnedMeshRenderer>().materials)
             {
-                float rmsEmgData = RMSCalculation(RTClient.GetInstance().GetAnalogChannel("BI_EMG 1").Values);
-                //print(rmsEmgData);
-                var matCounter = 0;
-                foreach (var mat in avatar.GetComponent<SkinnedMeshRenderer>().materials)
+                switch (mat.name)
                 {
-                    if (mat.name == "L_Scapular_part_of_deltoid_Pbr (Instance)")
-                    {
-                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color = new Color(255, 0, 0, rmsEmgData / 500f);
+                    case "L_Scapular_part_of_deltoid_Pbr (Instance)": // 3
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[0] / MuscleValuesRepo.MVIC[0]);
                         break;
-                    }
-                    matCounter++;
-                }
 
-                if (counter == movingWindow)
-                {
-                    emgData.Add(rmsEmgData);
-                    emgData.RemoveAt(0);
+                    case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // 4
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[1] / MuscleValuesRepo.MVIC[1]);
+                        break;
+
+                    case "L_Acromial_part_of_deltoid_Pbr (Instance)": // 6
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[2] / MuscleValuesRepo.MVIC[2]);
+                        break;
+
+                    case "R_Scapular_part_of_deltoid_Pbr (Instance)": // 10
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[3] / MuscleValuesRepo.MVIC[3]);
+                        break;
+
+                    case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // 11
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[4] / MuscleValuesRepo.MVIC[4]);
+                        break;
+
+                    case "R_Acromial_part_of_deltoid_Pbr (Instance)": // 13
+                        avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
+                            new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[5] / MuscleValuesRepo.MVIC[5]);
+                        break;
+
+                    default:
+                        break;
                 }
-                else
-                {
-                    counter++;
-                    emgData.Add(rmsEmgData);
-                }
+                matCounter++;
             }
-            catch (System.Exception)
-            {
-                print("Couldn't get muscle data");
-            }   
+            //}
+            //catch (System.Exception)
+            //{
+            //    print("Couldn't get muscle data");
+            //}
         }
-    }
-
-    float RMSCalculation(float[] arr)
-    {
-        if (arr.Length == 0)
-            return 0;
-        float square = 0;
-        float mean, root;
-
-        // Calculate square
-        for (int i = 0; i < arr.Length; i++)
-        {
-            square += (float)System.Math.Pow(arr[i], 2);
-        }
-
-        // Calculate Mean
-        mean = (square / (arr.Length));
-
-        // Calculate Root
-        root = (float)System.Math.Sqrt(mean);
-
-        return root;
     }
 }
