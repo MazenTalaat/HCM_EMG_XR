@@ -8,12 +8,12 @@ public class BarController : MonoBehaviour
     public ProgressBar progressBar;
     private Dictionary<string, int> _musclesMap = new Dictionary<string, int>
     {
-        { "R_Deltoid_Anterior", 0 },
-        { "R_Deltoid_Medius", 0 },
-        { "R_Deltoid_Posterior", 0 },
         { "L_Deltoid_Anterior", 0 },
-        { "L_Deltoid_Medius", 0 },
-        { "L_Deltoid_Posterior", 0 }
+        { "L_Deltoid_Medius", 1 },
+        { "L_Deltoid_Posterior", 2 },
+        { "R_Deltoid_Anterior", 3 },
+        { "R_Deltoid_Medius", 4 },
+        { "R_Deltoid_Posterior", 5 }
     };
     // Start is called before the first frame update
     void Start()

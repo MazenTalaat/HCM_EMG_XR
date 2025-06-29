@@ -11,14 +11,16 @@ using UnityEngine;
 /// </summary>
 public class MuscleValuesRepo : MonoBehaviour
 {
-    public GameObject graph;
+    public GameObject graphPanel;
+    public GameObject textMVICPanel;
+    public List<TMPro.TextMeshProUGUI> textMVIC;
 
-    public bool getMVIC = false;
+    public static bool getMVIC = false;
 
     private static int _channelCount = 6;
-    //{ "R_Deltoid_Anterior", 0 }, //{ "R_Deltoid_Medius", 0 }, //{ "R_Deltoid_Posterior", 0 },
     //{ "L_Deltoid_Anterior", 0 }, //{ "L_Deltoid_Medius", 0 }, //{ "L_Deltoid_Posterior", 0 }
-    private string[] _channelNames = { "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1", "BI_EMG 1" };
+    //{ "R_Deltoid_Anterior", 0 }, //{ "R_Deltoid_Medius", 0 }, //{ "R_Deltoid_Posterior", 0 },
+    private string[] _channelNames = { "BI_EMG 1", "TRI_EMG 1", "Rest_EMG 1", "Shoulder_EMG 1", "BI_EMG 1", "TRI_EMG 1" };
 
     private int _samplesCollected = 0;
     public static float timeStep = 0.05f;
@@ -51,8 +53,17 @@ public class MuscleValuesRepo : MonoBehaviour
         // One -> A, Two -> B, Three -> X, Four -> Y
         if (OVRInput.GetDown(OVRInput.Button.Four) || Input.GetKeyDown("y"))
         {
-            graph.SetActive(!graph.activeSelf);
+            graphPanel.SetActive(!graphPanel.activeSelf);
+            textMVICPanel.SetActive(!textMVICPanel.activeSelf);
             getMVIC = !getMVIC;
+        }
+
+        if (getMVIC)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                textMVIC[i].text = MVIC[i].ToString();
+            }
         }
     }
     private void GetEmgData()
