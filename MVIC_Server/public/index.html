@@ -1,0 +1,81 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit 12 Floats</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 700px; margin: 3rem auto; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; }
+  input { width: 100%; box-sizing: border-box; }
+  button { margin-top: 1rem; padding: 0.5rem 1rem; }
+</style>
+</head>
+<body>
+<h1>Float Editor</h1>
+<table id="vals"></table>
+<button id="saveAll">Save All</button>
+<button id="resetAll">Reset to 1</button>
+
+<script>
+const table = document.getElementById("vals");
+const saveAllBtn = document.getElementById("saveAll");
+const resetAllBtn = document.getElementById("resetAll");
+let current = [];
+
+// Build the table once we know the array length
+function render(values){
+  current = values;
+  table.innerHTML = "<tr><th>#</th><th>Value</th></tr>" +
+    values.map((v,i) =>
+      `<tr><td>${i}</td>
+         <td><input type="number" step="any" value="${v}" data-idx="${i}"></td></tr>`).join("");
+}
+
+// Fetch existing data
+fetch("/api/values").then(r => r.json()).then(render);
+
+// Save on field blur (single value)
+table.addEventListener("blur", e => {
+  if(e.target.matches("input[data-idx]")){
+    const idx = e.target.dataset.idx;
+    const value = parseFloat(e.target.value);
+    fetch(`/api/values/${idx}`, {
+      method:"PUT",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({value})
+    }).then(r=>r.ok?null:alert("Error saving"));
+  }
+}, true);
+
+// Optional “Save All” bulk button
+saveAllBtn.onclick = _=>{
+  const inputs = [...table.querySelectorAll("input")];
+  Promise.all(inputs.map(inp =>
+    fetch(`/api/values/${inp.dataset.idx}`, {
+      method:"PUT",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({value: parseFloat(inp.value)})
+    })
+  )).then(_=>alert("All saved!"));
+};
+
+resetAllBtn.onclick = () => {
+  fetch("/api/reset", { method: "POST" })
+    .then(r => r.json())
+    .then(data => render(data.values))
+    .catch(() => alert("Reset failed"));
+};
+
+setInterval(() => {
+  fetch("/api/values")
+    .then(r => r.json())
+    .then(data => {
+      // If nothing changed, skip DOM work
+      if (JSON.stringify(data) !== JSON.stringify(current)) render(data);
+    });
+}, 1000);
+</script>
+</body>
+</html>

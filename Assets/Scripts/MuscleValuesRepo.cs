@@ -32,6 +32,8 @@ public class MuscleValuesRepo : MonoBehaviour
     public static List<float> rmsEmgData = Enumerable.Repeat(0f, _channelCount).ToList();
     public static List<float> MVIC = Enumerable.Repeat(1f, _channelCount).ToList();
 
+    public FloatArrayClient client;
+
     private RTClient _rt;
 
     // Start is called before the first frame update
@@ -101,6 +103,11 @@ public class MuscleValuesRepo : MonoBehaviour
                     {
                         MVIC[i] = Math.Max(MVIC[i], rmsEmgData[i]);
                     }
+                    StartCoroutine(client.SendValues(
+                        MVIC.ToArray(),
+                        () => Debug.Log("PUT success"),
+                        err => Debug.LogError($"PUT failed: {err}")
+                    ));
                 }
 
                 //print("Raw: " + rawEmgData[0].ToString() + " RMS: " + rmsEmgData[0].ToString() + " MVIC: " + MVIC[0].ToString());
