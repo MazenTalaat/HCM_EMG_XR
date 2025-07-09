@@ -32,7 +32,7 @@ public class MuscleValuesRepo : MonoBehaviour
     public static List<float> rmsEmgData = Enumerable.Repeat(0f, _channelCount).ToList();
     public static List<float> MVIC = Enumerable.Repeat(1f, _channelCount).ToList();
 
-    public FloatArrayClient client;
+    public MVIC_Client client;
 
     private RTClient _rt;
 

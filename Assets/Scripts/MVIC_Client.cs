@@ -16,13 +16,13 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class FloatArrayClient : MonoBehaviour
+public class MVIC_Client : MonoBehaviour
 {
     [Tooltip("Base URL of the Node server, e.g. http://localhost:8080")]
     [SerializeField] private string serverBaseUrl = "http://localhost:8080";
 
     // -----------------------------------------------------------------------
-    // 1. READ the 6 floats  -------------------------------------------------
+    // 1. READ the 6 MVIC Values  -------------------------------------------------
     // -----------------------------------------------------------------------
     public IEnumerator GetValues(Action<float[]> onSuccess, Action<string> onError = null)
     {
@@ -40,7 +40,7 @@ public class FloatArrayClient : MonoBehaviour
     }
 
     // -----------------------------------------------------------------------
-    // 2. SEND a new 6-float array  -----------------------------------------
+    // 2. SEND a new 6-MVIC Values  -----------------------------------------
     // -----------------------------------------------------------------------
     public IEnumerator SendValues(float[] values,
                                   Action onSuccess = null,

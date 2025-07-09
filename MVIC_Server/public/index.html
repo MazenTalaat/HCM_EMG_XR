@@ -1,81 +1,188 @@
 <!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>Edit 12 Floats</title>
-<style>
-  body { font-family: system-ui, sans-serif; max-width: 700px; margin: 3rem auto; }
-  table { border-collapse: collapse; width: 100%; }
-  td, th { padding: 0.4rem 0.6rem; border-bottom: 1px solid #ddd; }
-  input { width: 100%; box-sizing: border-box; }
-  button { margin-top: 1rem; padding: 0.5rem 1rem; }
-</style>
+  <meta charset="utf-8">
+  <title>Shoulder MVIC Editor</title>
+
+  <!-- Local Tailwind build (works offline) -->
+  <link href="./tailwind.min.css" rel="stylesheet">
+
+  <style>
+    /* subtle fade-in after first data load */
+    body {
+      opacity: 0;
+      transition: opacity .4s ease;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+  </style>
 </head>
-<body>
-<h1>Float Editor</h1>
-<table id="vals"></table>
-<button id="saveAll">Save All</button>
-<button id="resetAll">Reset to 1</button>
 
-<script>
-const table = document.getElementById("vals");
-const saveAllBtn = document.getElementById("saveAll");
-const resetAllBtn = document.getElementById("resetAll");
-let current = [];
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-8">
 
-// Build the table once we know the array length
-function render(values){
-  current = values;
-  table.innerHTML = "<tr><th>#</th><th>Value</th></tr>" +
-    values.map((v,i) =>
-      `<tr><td>${i}</td>
-         <td><input type="number" step="any" value="${v}" data-idx="${i}"></td></tr>`).join("");
-}
+  <!-- ------------------------------------------------ title -->
+  <h1 class="text-3xl font-semibold mb-8 text-center w-full">
+    Shoulder&nbsp;MVIC&nbsp;Editor
+  </h1>
 
-// Fetch existing data
-fetch("/api/values").then(r => r.json()).then(render);
+  <!-- -------------------- participant-ID selector -->
+  <div class="mb-10 flex flex-wrap items-center gap-3">
+    <label for="pid" class="font-medium">Participant&nbsp;ID:</label>
 
-// Save on field blur (single value)
-table.addEventListener("blur", e => {
-  if(e.target.matches("input[data-idx]")){
-    const idx = e.target.dataset.idx;
-    const value = parseFloat(e.target.value);
-    fetch(`/api/values/${idx}`, {
-      method:"PUT",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({value})
-    }).then(r=>r.ok?null:alert("Error saving"));
-  }
-}, true);
+    <input id="pid" type="text" value="001" class="border rounded-lg p-2 w-32 focus:ring-2 focus:ring-blue-500">
 
-// Optional “Save All” bulk button
-saveAllBtn.onclick = _=>{
-  const inputs = [...table.querySelectorAll("input")];
-  Promise.all(inputs.map(inp =>
-    fetch(`/api/values/${inp.dataset.idx}`, {
-      method:"PUT",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({value: parseFloat(inp.value)})
-    })
-  )).then(_=>alert("All saved!"));
-};
+    <button id="loadId" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition">
+      Load
+    </button>
+  </div>
 
-resetAllBtn.onclick = () => {
-  fetch("/api/reset", { method: "POST" })
-    .then(r => r.json())
-    .then(data => render(data.values))
-    .catch(() => alert("Reset failed"));
-};
+  <!-- -------------- main two-column layout (grid + image) -->
+  <div class="w-full max-w-6xl mx-auto flex flex-col lg:flex-row lg:items-start gap-12">
 
-setInterval(() => {
-  fetch("/api/values")
-    .then(r => r.json())
-    .then(data => {
-      // If nothing changed, skip DOM work
-      if (JSON.stringify(data) !== JSON.stringify(current)) render(data);
-    });
-}, 1000);
-</script>
+    <!-- ---------------- LEFT : grid + buttons -->
+    <div class="flex-1">
+
+      <!-- muscle input grid -->
+      <div id="vals" class="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- headings stay permanently; JS adds cards afterwards -->
+        <h2 class="text-center font-medium text-xl">Left Shoulder</h2>
+        <h2 class="text-center font-medium text-xl">Right Shoulder</h2>
+      </div>
+
+      <!-- action buttons -->
+      <div class="mt-12 flex flex-wrap justify-center lg:justify-center gap-6">
+        <button id="saveAll" class="px-6 py-2 rounded-2xl shadow bg-blue-600 text-white hover:bg-blue-700 transition">
+          Save All
+        </button>
+
+        <button id="resetAll" class="px-6 py-2 rounded-2xl shadow bg-red-500 text-white hover:bg-red-600 transition">
+          Reset to 1
+        </button>
+      </div>
+    </div>
+
+    <!-- ---------------- RIGHT : anatomy image -->
+    <div class="flex-shrink-0 lg:self-center">
+      <img src="./shoulder_anatomy.jpg" alt="Shoulder muscle anatomy" class="w-full max-w-sm rounded-xl shadow">
+
+      <!-- image credit -->
+      <p class="mt-2 text-xs text-center text-gray-500">
+        Image credit:&nbsp;
+        <a href="https://www.bodybuildingmealplan.com/" target="_blank" class="underline">
+          BodybuildingMealPlan.com
+        </a>
+      </p>
+    </div>
+
+    <!-- ------------------------------------------------ JavaScript -->
+    <script>
+      /* -------------------------- setup --------------------------- */
+      const container = document.getElementById("vals");
+      const saveAllBtn = document.getElementById("saveAll");
+      const resetAllBtn = document.getElementById("resetAll");
+      const idInput = document.getElementById("pid");
+      const loadBtn = document.getElementById("loadId");
+
+      const labels = [
+        "L_Deltoid_Anterior", "L_Deltoid_Medius", "L_Deltoid_Posterior",
+        "R_Deltoid_Anterior", "R_Deltoid_Medius", "R_Deltoid_Posterior"
+      ];
+
+      let currentId = "001";
+      let current = [];
+
+      /* ------------------------ render ---------------------------- */
+      function render(values) {
+        current = values;
+        // Remove everything after the two heading cells
+        while (container.children.length > 2) container.removeChild(container.lastChild);
+
+        for (let r = 0; r < 3; r++) {
+          container.appendChild(makeCard(r, labels[r], values[r]));
+          const rIdx = r + 3;
+          container.appendChild(makeCard(rIdx, labels[rIdx], values[rIdx]));
+        }
+      }
+
+      function makeCard(idx, label, value) {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl shadow p-4 flex flex-col gap-2 h-full";
+        card.innerHTML = `
+        <span class="font-medium">${label}</span>
+        <input type="number" step="any" value="${value}" data-idx="${idx}"
+               class="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+      `;
+        return card;
+      }
+
+      /* --------------------- initial load ------------------------- */
+      fetch(`/api/values/${currentId}`)
+        .then(r => r.json())
+        .then(render)
+        .finally(() => document.body.classList.add("loaded"));
+
+      /* ------------------- Load-ID button ------------------------- */
+      loadBtn.onclick = () => {
+        const newId = idInput.value.trim();
+        if (!newId) { alert("Please enter an ID"); return; }
+        currentId = newId;
+
+        fetch(`/api/current/${currentId}`, { method: "POST" });
+
+        fetch(`/api/values/${currentId}`)
+          .then(r => r.json())
+          .then(render)
+          .catch(() => alert("Failed to load data for that ID"));
+      };
+
+      /* ---------- single-field save (on blur) --------------------- */
+      container.addEventListener("blur", e => {
+        if (e.target.matches("input[data-idx]")) {
+          const idx = e.target.dataset.idx;
+          const val = parseFloat(e.target.value);
+          fetch(`/api/values/${currentId}/${idx}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: val })
+          }).then(r => { if (!r.ok) alert("Save failed"); });
+        }
+      }, true);
+
+      /* ------------------- Save All button ------------------------ */
+      saveAllBtn.onclick = () => {
+        if (!confirm("Save ALL current values?")) return;
+        const inputs = [...container.querySelectorAll("input[data-idx]")];
+        Promise.all(inputs.map(inp =>
+          fetch(`/api/values/${currentId}/${inp.dataset.idx}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: parseFloat(inp.value) })
+          })
+        )).then(() => alert("All values saved!"));
+      };
+
+      /* ------------------ Reset button ---------------------------- */
+      resetAllBtn.onclick = () => {
+        if (!confirm("Reset EVERY value to 1?")) return;
+        fetch(`/api/reset/${currentId}`, { method: "POST" })
+          .then(r => r.json())
+          .then(d => render(d.values))
+          .then(() => alert("All values reset!"));
+      };
+
+      /* -------------------- light polling ------------------------- */
+      setInterval(() => {
+        fetch(`/api/values/${currentId}`)
+          .then(r => r.json())
+          .then(d => {
+            if (JSON.stringify(d) !== JSON.stringify(current)) render(d);
+          });
+      }, 1000);
+    </script>
 </body>
+
 </html>
