@@ -31,4 +31,23 @@ public class VizController : MonoBehaviour
             avatar.SetActive(!avatar.activeSelf);
         }
     }
+
+    public void showViz(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                avatar.SetActive(!avatar.activeSelf);
+                break;
+            case 1:
+                progressBar.SetActive(!progressBar.activeSelf);
+                break;
+            case 2:
+                graph.SetActive(!graph.activeSelf);
+                break;
+
+            default:
+                break;
+        }
+    }
 }

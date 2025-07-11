@@ -119,7 +119,14 @@ public class MuscleValuesRepo : MonoBehaviour
         }
     }
 
-    public void ReadMVIC()
+    public void CalculateMVIC()
+    {
+        graphPanel.SetActive(!graphPanel.activeSelf);
+        textMVICPanel.SetActive(!textMVICPanel.activeSelf);
+        getMVIC = !getMVIC;
+    }
+
+    public void GetMVIC()
     {
         StartCoroutine(client.GetValues(
             vals =>
@@ -128,6 +135,10 @@ public class MuscleValuesRepo : MonoBehaviour
             },
             err => Debug.LogError($"GET failed: {err}")
         ));
+        for (int i = 0; i < 6; i++)
+        {
+            textMVIC[i].text = MVIC[i].ToString();
+        }
     }
 
     float RMSCalculation(float[] samples)
