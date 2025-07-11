@@ -119,6 +119,17 @@ public class MuscleValuesRepo : MonoBehaviour
         }
     }
 
+    public void ReadMVIC()
+    {
+        StartCoroutine(client.GetValues(
+            vals =>
+            {
+                MVIC = vals.ToList();
+            },
+            err => Debug.LogError($"GET failed: {err}")
+        ));
+    }
+
     float RMSCalculation(float[] samples)
     {
         if (samples == null || samples.Length == 0) return 0f;
