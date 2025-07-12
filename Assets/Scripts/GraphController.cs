@@ -36,10 +36,19 @@ public class GraphController : MonoBehaviour
     {
         if (MuscleValuesRepo.getMVIC)
         {
-            tempMVIC = Math.Max(MuscleValuesRepo.MVIC[emgIndex[0]], MuscleValuesRepo.MVIC[emgIndex[1]]);
-            tempMVIC = Math.Max(tempMVIC, MuscleValuesRepo.MVIC[emgIndex[2]]);
-            m_DataDiagram.m_CentimeterPerCoordUnitY = (13.0f/1300)*(1300/ (1.1f * tempMVIC));
+            AdjustDiagramScale();
         }
+    }
+
+    public void AdjustDiagramScale()
+    {
+        tempMVIC = Math.Max(MuscleValuesRepo.MVIC[emgIndex[0]], MuscleValuesRepo.MVIC[emgIndex[1]]);
+        tempMVIC = Math.Max(tempMVIC, MuscleValuesRepo.MVIC[emgIndex[2]]);
+        if (m_DataDiagram == null)
+        {
+            m_DataDiagram = dd.GetComponent<DD_DataDiagram>();
+        }
+        m_DataDiagram.m_CentimeterPerCoordUnitY = (13.0f / 1300) * (1300 / (1.1f * tempMVIC));
     }
 
     void AddLines()
@@ -79,7 +88,7 @@ public class GraphController : MonoBehaviour
                 m_DataDiagram.InputPoint(lineList[1], new Vector2(MuscleValuesRepo.timeStep, MuscleValuesRepo.rmsEmgData[emgIndex[1]]));
                 m_DataDiagram.InputPoint(lineList[2], new Vector2(MuscleValuesRepo.timeStep, MuscleValuesRepo.rmsEmgData[emgIndex[2]]));
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 print("Couldn't get muscle data");
             }

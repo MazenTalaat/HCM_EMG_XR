@@ -42,34 +42,34 @@ public class MuscleColourController : MonoBehaviour
                 {
                     switch (mat.name)
                     {
-                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // 3
+                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // 3 Posterior
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[0] / MuscleValuesRepo.MVIC[0]);
+                                new Color(0, 0, 255, MuscleValuesRepo.rmsEmgData[0] / MuscleValuesRepo.MVIC[0]);
                             break;
 
-                        case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // 4
+                        case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // 4 Anterior
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
                                 new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[1] / MuscleValuesRepo.MVIC[1]);
                             break;
 
-                        case "L_Acromial_part_of_deltoid_Pbr (Instance)": // 6
+                        case "L_Acromial_part_of_deltoid_Pbr (Instance)": // 6 Medius
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[2] / MuscleValuesRepo.MVIC[2]);
+                                new Color(0, 255, 0, MuscleValuesRepo.rmsEmgData[2] / MuscleValuesRepo.MVIC[2]);
                             break;
 
-                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // 10
+                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // 10 Posterior
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[3] / MuscleValuesRepo.MVIC[3]);
+                                new Color(0, 0, 255, MuscleValuesRepo.rmsEmgData[3] / MuscleValuesRepo.MVIC[3]);
                             break;
 
-                        case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // 11
+                        case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // 11 Anterior
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
                                 new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[4] / MuscleValuesRepo.MVIC[4]);
                             break;
 
-                        case "R_Acromial_part_of_deltoid_Pbr (Instance)": // 13
+                        case "R_Acromial_part_of_deltoid_Pbr (Instance)": // 13 Medius
                             avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[5] / MuscleValuesRepo.MVIC[5]);
+                                new Color(0, 255, 0, MuscleValuesRepo.rmsEmgData[5] / MuscleValuesRepo.MVIC[5]);
                             break;
 
                         default:

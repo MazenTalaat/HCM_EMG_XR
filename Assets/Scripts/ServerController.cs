@@ -60,11 +60,7 @@ public class ServerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // One -> A, Two -> B, Three -> X, Four -> Y
-        if (OVRInput.GetDown(OVRInput.Button.Start) || Input.GetKeyDown("m"))
-        {
-            serverCylinder.SetActive(!serverCylinder.activeSelf);
-        }
+
     }
 
 public void ConnectOnClick()

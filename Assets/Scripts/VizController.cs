@@ -17,19 +17,7 @@ public class VizController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // One -> A, Two -> B, Three -> X, Four -> Y
-        if (OVRInput.GetDown(OVRInput.Button.One) || Input.GetKeyDown("a"))
-        {
-            progressBar.SetActive(!progressBar.activeSelf);
-        }
-        else if (OVRInput.GetDown(OVRInput.Button.Two) || Input.GetKeyDown("b"))
-        {
-            graph.SetActive(!graph.activeSelf);
-        }
-        else if (OVRInput.GetDown(OVRInput.Button.Three) || Input.GetKeyDown("x"))
-        {
-            avatar.SetActive(!avatar.activeSelf);
-        }
+
     }
 
     public void showViz(int index)

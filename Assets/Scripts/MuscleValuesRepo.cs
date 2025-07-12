@@ -36,6 +36,8 @@ public class MuscleValuesRepo : MonoBehaviour
 
     private RTClient _rt;
 
+    public List<GraphController> graphControllers;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,14 +54,6 @@ public class MuscleValuesRepo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // One -> A, Two -> B, Three -> X, Four -> Y
-        if (OVRInput.GetDown(OVRInput.Button.Four) || Input.GetKeyDown("y"))
-        {
-            graphPanel.SetActive(!graphPanel.activeSelf);
-            textMVICPanel.SetActive(!textMVICPanel.activeSelf);
-            getMVIC = !getMVIC;
-        }
-
         if (getMVIC)
         {
             for (int i = 0; i < 6; i++)
@@ -121,7 +115,6 @@ public class MuscleValuesRepo : MonoBehaviour
 
     public void CalculateMVIC()
     {
-        graphPanel.SetActive(!graphPanel.activeSelf);
         textMVICPanel.SetActive(!textMVICPanel.activeSelf);
         getMVIC = !getMVIC;
     }
@@ -132,13 +125,18 @@ public class MuscleValuesRepo : MonoBehaviour
             vals =>
             {
                 MVIC = vals.ToList();
+                for (int i = 0; i < 6; i++)
+                {
+                    textMVIC[i].text = MVIC[i].ToString();
+                }
+
+                foreach (var graph in graphControllers)
+                {
+                    graph.AdjustDiagramScale();
+                }
             },
             err => Debug.LogError($"GET failed: {err}")
         ));
-        for (int i = 0; i < 6; i++)
-        {
-            textMVIC[i].text = MVIC[i].ToString();
-        }
     }
 
     float RMSCalculation(float[] samples)
