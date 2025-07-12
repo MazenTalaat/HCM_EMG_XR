@@ -117,6 +117,10 @@ public class MuscleValuesRepo : MonoBehaviour
     {
         textMVICPanel.SetActive(!textMVICPanel.activeSelf);
         getMVIC = !getMVIC;
+        foreach (var graph in graphControllers)
+        {
+            graph.AdjustDiagramScale();
+        }
     }
 
     public void GetMVIC()
