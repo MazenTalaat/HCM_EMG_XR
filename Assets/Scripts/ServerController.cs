@@ -18,8 +18,8 @@ public class ServerController : MonoBehaviour
     public GameObject avatar;
     private List<DiscoveryResponse> discoveryResponses;
 
-    private string serverIP;
-    private short serverPort;
+    private string serverIP = EndPoints.QTM_ServerEndpoint;
+    private short serverPort = 22222;
 
     // Start is called before the first frame update
     void Start()
@@ -60,7 +60,11 @@ public class ServerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        // One -> A, Two -> B, Three -> X, Four -> Y
+        if (OVRInput.GetDown(OVRInput.Button.Start) || Input.GetKeyDown("m"))
+        {
+            serverCylinder.SetActive(!serverCylinder.activeSelf);
+        }
     }
 
 public void ConnectOnClick()
@@ -72,8 +76,7 @@ public void ConnectOnClick()
     {
         // TODO Add here a static IP and make sure that the PC has a static IP too.
         //RTClient.GetInstance().StartConnecting("192.168.0.122", 22222, false, true, false, false, true, true, false);
-        RTClient.GetInstance().StartConnecting("192.168.1.55", 22222, false, true, false, false, true, true, false);
-        //RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
+        RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
         statusText.text = "Connecting ...";
         statusText.color = Color.yellow;
         print("Connecting ...");

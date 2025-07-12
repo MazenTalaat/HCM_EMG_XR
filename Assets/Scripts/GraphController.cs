@@ -48,7 +48,11 @@ public class GraphController : MonoBehaviour
         {
             m_DataDiagram = dd.GetComponent<DD_DataDiagram>();
         }
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
         m_DataDiagram.m_CentimeterPerCoordUnitY = (13.0f / 1300) * (1300 / (1.1f * tempMVIC));
+#elif UNITY_ANDROID
+        m_DataDiagram.m_CentimeterPerCoordUnitY = (13.0f / 1300) * (1300 / (1.1f * tempMVIC)) / 2;
+#endif
     }
 
     void AddLines()

@@ -18,8 +18,7 @@ using UnityEngine.Networking;
 
 public class MVIC_Client : MonoBehaviour
 {
-    [Tooltip("Base URL of the Node server, e.g. http://localhost:8080")]
-    [SerializeField] private string serverBaseUrl = "http://localhost:8080";
+    private string serverBaseUrl = EndPoints.MVIC_ServerEndpoint;
 
     // -----------------------------------------------------------------------
     // 1. READ the 6 MVIC Values  -------------------------------------------------
