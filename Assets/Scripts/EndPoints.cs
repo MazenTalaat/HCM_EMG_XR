@@ -2,20 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Stores network endpoint addresses for MVIC and QTM servers used in EMG data acquisition.
+/// </summary>
 public class EndPoints : MonoBehaviour
 {
-    public static string MVIC_ServerEndpoint = "http://192.168.1.55:8080";
-    public static string QTM_ServerEndpoint = "192.168.1.55";
+    // Base URL for the MVIC server (used for saving and retrieving MVIC values)
+    public static string MVICServerUrl = "http://192.168.1.55:8080";
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // IP address for the Qualisys Track Manager (QTM) server (used for real-time EMG streaming)
+    public static string QTMServerIp = "192.168.1.55";
 }

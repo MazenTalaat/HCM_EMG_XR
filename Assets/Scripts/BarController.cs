@@ -3,10 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls the progress bar UI for displaying normalized EMG activity for a selected muscle.
+/// Updates the bar value in real-time based on RMS EMG and MVIC data.
+/// </summary>
 public class BarController : MonoBehaviour
 {
-    public ProgressBar progressBar;
-    private Dictionary<string, int> _musclesMap = new Dictionary<string, int>
+    public ProgressBar progressBar; // Reference to the ProgressBar UI component
+
+    // Maps muscle names to their corresponding EMG channel indices
+    private Dictionary<string, int> muscleNameToChannelIndex = new Dictionary<string, int>
     {
         { "L_Deltoid_Anterior", 0 },
         { "L_Deltoid_Medius", 1 },
@@ -15,28 +21,32 @@ public class BarController : MonoBehaviour
         { "R_Deltoid_Medius", 4 },
         { "R_Deltoid_Posterior", 5 }
     };
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
 
-    // Update is called once per frame
+    // Called once per frame
     void Update()
     {
-        GetEmgData();
+        UpdateProgressBarWithEmgData();
     }
 
-    private void GetEmgData()
+    /// <summary>
+    /// Updates the progress bar value based on normalized EMG data for the selected muscle.
+    /// </summary>
+    private void UpdateProgressBarWithEmgData()
     {
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
             try
             {
-                progressBar.BarValue = (int)(MuscleValuesRepo.rmsEmgData[_musclesMap[progressBar.Title]] / MuscleValuesRepo.MVIC[_musclesMap[progressBar.Title]] * 100);
+                int channelIndex = muscleNameToChannelIndex[progressBar.Title];
+                // Calculate normalized EMG activity as a percentage
+                progressBar.BarValue = (int)(
+                    MuscleValuesRepo.rmsEmgValues[channelIndex] /
+                    MuscleValuesRepo.mvicValues[channelIndex] * 100
+                );
             }
             catch (System.Exception)
             {
-                print("Couldn't get muscle data");
+                Debug.LogWarning("Couldn't get muscle data for progress bar.");
             }
         }
     }

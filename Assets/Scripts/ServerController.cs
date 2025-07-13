@@ -10,112 +10,128 @@ using System;
 
 public class ServerController : MonoBehaviour
 {
-    public GameObject toggleButtonPrefab;
-    public GameObject scrollViewContent;
-    public GameObject serverCylinder;
-    public TextMeshProUGUI statusText;
-    public List<Button> serverButtons;
-    public GameObject avatar;
-    private List<DiscoveryResponse> discoveryResponses;
+    [Header("UI References")]
+    public GameObject toggleButtonPrefab; // Prefab for server selection toggle button
+    public GameObject scrollViewContent;  // Content container for server list
+    public GameObject serverSelectionPanel; // Cylinder panel for server selection
+    public TextMeshProUGUI statusText;    // UI text for connection status
+    public List<Button> serverActionButtons; // Buttons for connect/disconnect actions
 
-    private string serverIP = EndPoints.QTM_ServerEndpoint;
-    private short serverPort = 22222;
+    [Header("Avatar Reference")]
+    public GameObject avatar; // Avatar GameObject to activate on connection
 
-    // Start is called before the first frame update
+    private List<DiscoveryResponse> availableServers; // List of discovered QTM servers
+
+    // Current server IP and port for connection
+    private string selectedServerIp = EndPoints.QTMServerIp;
+    private short selectedServerPort = 22222;
+
+    // Called on script initialization
     void Start()
     {
-        UpdateServers();
-        serverButtons[0].interactable = true;
-        serverButtons[1].interactable = true;
-        serverButtons[2].interactable = false;
+        RefreshServerList();
+        serverActionButtons[0].interactable = true;  // Connect
+        serverActionButtons[1].interactable = true;  // Refresh
+        serverActionButtons[2].interactable = false; // Disconnect
         ConnectOnClick();
     }
 
-    public void UpdateServers()
+    /// <summary>
+    /// Refreshes the server list UI and populates with discovered QTM servers.
+    /// </summary>
+    public void RefreshServerList()
     {
-        for (int i=0; i<scrollViewContent.transform.childCount; i++)
+        // Clear previous server entries
+        for (int i = 0; i < scrollViewContent.transform.childCount; i++)
         {
             Destroy(scrollViewContent.transform.GetChild(i).gameObject);
         }
 
-        discoveryResponses = RTClient.GetInstance().GetServers();
-        foreach (DiscoveryResponse server in discoveryResponses)
+        availableServers = RTClient.GetInstance().GetServers();
+        foreach (DiscoveryResponse server in availableServers)
         {
-            var toggleButtonGO = GameObject.Instantiate(toggleButtonPrefab, scrollViewContent.transform);
-            toggleButtonGO.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = "Host name: " + server.HostName + "\nIP: " + server.IpAddress + ":" + server.Port;
-            // print("************************************************");
-            // print("Host name: " + server.HostName + "\nIP: " + server.IpAddress + ":" + server.Port);
-            // print("************************************************");
+            var toggleButtonGO = Instantiate(toggleButtonPrefab, scrollViewContent.transform);
+            toggleButtonGO.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                $"Host name: {server.HostName}\nIP: {server.IpAddress}:{server.Port}";
+
             toggleButtonGO.GetComponent<ToggleDeselect>().group = scrollViewContent.GetComponent<ToggleGroup>();
             toggleButtonGO.GetComponent<ToggleDeselect>().onValueChanged.AddListener(delegate {
                 if (toggleButtonGO.GetComponent<ToggleDeselect>().isOn)
                 {
-                    serverIP = server.IpAddress;
-                    serverPort = server.Port;
+                    selectedServerIp = server.IpAddress;
+                    selectedServerPort = server.Port;
                 }
             });
         }
     }
 
-    // Update is called once per frame
+    // Called once per frame
     void Update()
     {
-        // One -> A, Two -> B, Three -> X, Four -> Y
+        // Toggle server selection panel with Start button or 'm' key
         if (OVRInput.GetDown(OVRInput.Button.Start) || Input.GetKeyDown("m"))
         {
-            serverCylinder.SetActive(!serverCylinder.activeSelf);
+            serverSelectionPanel.SetActive(!serverSelectionPanel.activeSelf);
         }
     }
 
-public void ConnectOnClick()
+    /// <summary>
+    /// Initiates connection to the selected QTM server.
+    /// </summary>
+    public void ConnectOnClick()
     {
-        StartCoroutine(Connect());
+        StartCoroutine(ConnectToServer());
     }
 
-    IEnumerator Connect()
+    /// <summary>
+    /// Coroutine: Connects to the selected QTM server and updates UI status.
+    /// </summary>
+    IEnumerator ConnectToServer()
     {
-        // TODO Add here a static IP and make sure that the PC has a static IP too.
-        //RTClient.GetInstance().StartConnecting("192.168.0.122", 22222, false, true, false, false, true, true, false);
-        RTClient.GetInstance().StartConnecting(serverIP, serverPort, false, true, false, false, true, true, false);
+        RTClient.GetInstance().StartConnecting(selectedServerIp, selectedServerPort, false, true, false, false, true, true, false);
         statusText.text = "Connecting ...";
         statusText.color = Color.yellow;
-        print("Connecting ...");
+        Debug.Log("Connecting ...");
 
+        // Wait for connection to complete
         while (RTClient.GetInstance().ConnectionState == RTConnectionState.Connecting)
         {
-            serverButtons[0].interactable = false;
-            serverButtons[1].interactable = false;
+            serverActionButtons[0].interactable = false;
+            serverActionButtons[1].interactable = false;
             yield return null;
         }
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
-            serverButtons[0].interactable = false;
-            serverButtons[1].interactable = false;
-            serverButtons[2].interactable = true;
-            serverCylinder.SetActive(false);
+            serverActionButtons[0].interactable = false;
+            serverActionButtons[1].interactable = false;
+            serverActionButtons[2].interactable = true;
+            serverSelectionPanel.SetActive(false);
             statusText.text = "Connected";
             statusText.color = Color.green;
-            print("Connected");
+            Debug.Log("Connected");
         }
         else
         {
-            serverButtons[0].interactable = true;
-            serverButtons[1].interactable = true;
-            serverButtons[2].interactable = false;
+            serverActionButtons[0].interactable = true;
+            serverActionButtons[1].interactable = true;
+            serverActionButtons[2].interactable = false;
             statusText.text = "Could not connect to this server";
             statusText.color = Color.red;
-            print("Could not connect to this server");
+            Debug.Log("Could not connect to this server");
         }
     }
 
+    /// <summary>
+    /// Disconnects from the current QTM server and resets UI/Avatar.
+    /// </summary>
     public void DisconnectOnClick()
     {
-        serverButtons[0].interactable = true;
-        serverButtons[1].interactable = true;
-        serverButtons[2].interactable = false;
+        serverActionButtons[0].interactable = true;
+        serverActionButtons[1].interactable = true;
+        serverActionButtons[2].interactable = false;
         statusText.text = "Waiting";
         statusText.color = Color.white;
-        avatar.gameObject.SetActive(false);
+        avatar.SetActive(false);
         RTClient.GetInstance().Disconnect();
     }
 }

@@ -6,132 +6,146 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Samples six EMG analog channels from Qualisys RT, keeps a sliding-window RMS,
+/// Handles sampling of six EMG analog channels from Qualisys RT, maintains a sliding-window RMS,
 /// and tracks the Maximum Voluntary Isometric Contraction (MVIC) for each channel.
+/// Also updates UI elements and communicates with MVIC_Client for data persistence.
 /// </summary>
 public class MuscleValuesRepo : MonoBehaviour
 {
-    public GameObject graphPanel;
-    public GameObject textMVICPanel;
-    public List<TMPro.TextMeshProUGUI> textMVIC;
+    [Header("UI References")]
+    public GameObject graphPanel; // Panel displaying EMG graphs
+    public GameObject mvicTextPanel; // Panel displaying MVIC values
+    public List<TMPro.TextMeshProUGUI> mvicTextFields; // Text fields for MVIC display
 
-    public static bool getMVIC = false;
+    public static bool isMVICTrackingActive = false; // Indicates if MVIC tracking is enabled
 
-    private static int _channelCount = 6;
-    //{ "L_Deltoid_Anterior", 0 }, //{ "L_Deltoid_Medius", 0 }, //{ "L_Deltoid_Posterior", 0 }
-    //{ "R_Deltoid_Anterior", 0 }, //{ "R_Deltoid_Medius", 0 }, //{ "R_Deltoid_Posterior", 0 },
-    private string[] _channelNames = { "BI_EMG 1", "TRI_EMG 1", "Rest_EMG 1", "Shoulder_EMG 1", "BI_EMG 1", "TRI_EMG 1" };
+    private static int ChannelCount = 6;
+    // Channel names for EMG analog input (update as needed for your setup)
+    private string[] channelNames = { "BI_EMG 1", "TRI_EMG 1", "Rest_EMG 1", "Shoulder_EMG 1", "BI_EMG 1", "TRI_EMG 1" };
 
-    private int _samplesCollected = 0;
-    public static float timeStep = 0.05f;
-    private int _movingWindowSize = 20;
+    private int samplesCollected = 0;
+    public static float SamplingInterval = 0.05f; // Time between EMG samples (seconds)
+    private int rmsWindowSize = 20; // Number of samples in RMS moving window
 
-    private List<float> _rawEmgData = Enumerable.Repeat(0f, _channelCount).ToList();
-    private List<List<float>> _rmsWindow;
+    private List<float> latestEmgSample = Enumerable.Repeat(0f, ChannelCount).ToList(); // Latest EMG sample per channel
+    private List<List<float>> rmsSampleWindow; // Sliding window of samples for RMS calculation
 
-    public static List<float> rmsEmgData = Enumerable.Repeat(0f, _channelCount).ToList();
-    public static List<float> MVIC = Enumerable.Repeat(1f, _channelCount).ToList();
+    public static List<float> rmsEmgValues = Enumerable.Repeat(0f, ChannelCount).ToList(); // Current RMS value per channel
+    public static List<float> mvicValues = Enumerable.Repeat(1f, ChannelCount).ToList(); // MVIC value per channel
 
-    public MVIC_Client client;
+    public MVIC_Client mvicClient; // Handles server communication for MVIC values
 
-    private RTClient _rt;
+    private RTClient rtClient; // Qualisys RT client instance
 
-    public List<GraphController> graphControllers;
+    public List<GraphController> graphControllers; // Graph controllers for each channel
 
-    // Start is called before the first frame update
+    // Called on script initialization
     void Start()
     {
-        _rmsWindow = new List<List<float>>();
-        for (int i = 0; i < _channelCount; i++)
+        // Initialize RMS sample window for each channel
+        rmsSampleWindow = new List<List<float>>();
+        for (int i = 0; i < ChannelCount; i++)
         {
-            _rmsWindow.Add(new List<float>());
+            rmsSampleWindow.Add(new List<float>());
         }
 
-        _rt = RTClient.GetInstance();
-        InvokeRepeating(nameof(GetEmgData), 0.01f, timeStep);
+        rtClient = RTClient.GetInstance();
+        InvokeRepeating(nameof(SampleEmgData), 0.01f, SamplingInterval);
     }
 
-    // Update is called once per frame
+    // Called once per frame
     void Update()
     {
-        if (getMVIC)
+        // Update MVIC text fields if tracking is active
+        if (isMVICTrackingActive)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < ChannelCount; i++)
             {
-                textMVIC[i].text = MVIC[i].ToString();
+                mvicTextFields[i].text = mvicValues[i].ToString();
             }
         }
     }
-    private void GetEmgData()
+
+    /// <summary>
+    /// Samples EMG data from Qualisys RT, updates RMS and MVIC values, and sends MVIC to server if tracking.
+    /// </summary>
+    private void SampleEmgData()
     {
-        if (_rt.ConnectionState == RTConnectionState.Connected)
+        if (rtClient.ConnectionState == RTConnectionState.Connected)
         {
             try
             {
-                for (int i = 0; i < _channelCount; ++i)
+                // Sample each channel and calculate RMS for current sample
+                for (int i = 0; i < ChannelCount; ++i)
                 {
-                    _rawEmgData[i] = RMSCalculation(_rt.GetAnalogChannel(_channelNames[i]).Values);
+                    latestEmgSample[i] = CalculateRMS(rtClient.GetAnalogChannel(channelNames[i]).Values);
                 }
 
-                if (_samplesCollected == _movingWindowSize)
+                // Maintain sliding window for RMS calculation
+                if (samplesCollected == rmsWindowSize)
                 {
-                    for (int i = 0; i < _channelCount; i++)
+                    for (int i = 0; i < ChannelCount; i++)
                     {
-                        _rmsWindow[i].Add(_rawEmgData[i]);
-                        _rmsWindow[i].RemoveAt(0);
-                        rmsEmgData[i] = RMSCalculation(_rmsWindow[i].ToArray());
+                        rmsSampleWindow[i].Add(latestEmgSample[i]);
+                        rmsSampleWindow[i].RemoveAt(0);
+                        rmsEmgValues[i] = CalculateRMS(rmsSampleWindow[i].ToArray());
                     }
                 }
                 else
                 {
-                    _samplesCollected++;
-                    for (int i = 0; i < _channelCount; i++)
+                    samplesCollected++;
+                    for (int i = 0; i < ChannelCount; i++)
                     {
-                        _rmsWindow[i].Add(_rawEmgData[i]);
+                        rmsSampleWindow[i].Add(latestEmgSample[i]);
                     }
                 }
 
-                if (getMVIC == true)
+                // Update MVIC values and send to server if tracking is active
+                if (isMVICTrackingActive)
                 {
-                    for (int i = 0; i < _channelCount; i++)
+                    for (int i = 0; i < ChannelCount; i++)
                     {
-                        MVIC[i] = Math.Max(MVIC[i], rmsEmgData[i]);
+                        mvicValues[i] = Math.Max(mvicValues[i], rmsEmgValues[i]);
                     }
-                    StartCoroutine(client.SendValues(
-                        MVIC.ToArray(),
-                        () => Debug.Log("PUT success"),
-                        err => Debug.LogError($"PUT failed: {err}")
+                    StartCoroutine(mvicClient.SendMVICValues(
+                        mvicValues.ToArray(),
+                        () => Debug.Log("MVIC PUT success"),
+                        err => Debug.LogError($"MVIC PUT failed: {err}")
                     ));
                 }
-
-                //print("Raw: " + rawEmgData[0].ToString() + " RMS: " + rmsEmgData[0].ToString() + " MVIC: " + MVIC[0].ToString());
             }
             catch (Exception)
             {
-                print("Couldn't get muscle data");
+                Debug.LogWarning("Couldn't get muscle data");
             }
         }
     }
 
-    public void CalculateMVIC()
+    /// <summary>
+    /// Toggles MVIC tracking and updates UI/graph scaling.
+    /// </summary>
+    public void ToggleMVICTracking()
     {
-        textMVICPanel.SetActive(!textMVICPanel.activeSelf);
-        getMVIC = !getMVIC;
+        mvicTextPanel.SetActive(!mvicTextPanel.activeSelf);
+        isMVICTrackingActive = !isMVICTrackingActive;
         foreach (var graph in graphControllers)
         {
             graph.AdjustDiagramScale();
         }
     }
 
-    public void GetMVIC()
+    /// <summary>
+    /// Fetches MVIC values from server and updates UI/graph scaling.
+    /// </summary>
+    public void FetchMVICFromServer()
     {
-        StartCoroutine(client.GetValues(
+        StartCoroutine(mvicClient.GetMVICValues(
             vals =>
             {
-                MVIC = vals.ToList();
-                for (int i = 0; i < 6; i++)
+                mvicValues = vals.ToList();
+                for (int i = 0; i < ChannelCount; i++)
                 {
-                    textMVIC[i].text = MVIC[i].ToString();
+                    mvicTextFields[i].text = mvicValues[i].ToString();
                 }
 
                 foreach (var graph in graphControllers)
@@ -139,11 +153,16 @@ public class MuscleValuesRepo : MonoBehaviour
                     graph.AdjustDiagramScale();
                 }
             },
-            err => Debug.LogError($"GET failed: {err}")
+            err => Debug.LogError($"MVIC GET failed: {err}")
         ));
     }
 
-    float RMSCalculation(float[] samples)
+    /// <summary>
+    /// Calculates RMS value for a set of samples.
+    /// </summary>
+    /// <param name="samples">Array of EMG samples</param>
+    /// <returns>RMS value</returns>
+    float CalculateRMS(float[] samples)
     {
         if (samples == null || samples.Length == 0) return 0f;
 

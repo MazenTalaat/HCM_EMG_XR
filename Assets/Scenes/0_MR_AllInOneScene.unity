@@ -2231,7 +2231,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 243424268127923124, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: m_Name
-      value: CalculateMVIC
+      value: ToggleMVIC
       objectReference: {fileID: 0}
     - target: {fileID: 243424268127923124, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: m_IsActive
@@ -2467,7 +2467,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: CalculateMVIC
+      value: ToggleMVICTracking
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -2729,7 +2729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: showViz
+      value: ToggleVisualization
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3811,7 +3811,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: showViz
+      value: ToggleVisualization
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3939,7 +3939,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1652840843}
         m_TargetAssemblyTypeName: ServerController, Assembly-CSharp
         m_MethodName: ConnectOnClick
         m_Mode: 1
@@ -17033,7 +17033,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 243424268127923124, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: m_Name
-      value: GetMVIC
+      value: FetchMVIC
       objectReference: {fileID: 0}
     - target: {fileID: 243424268127923124, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: m_IsActive
@@ -17269,7 +17269,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: GetMVIC
+      value: FetchMVICFromServer
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -23776,8 +23776,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24625d348f94c8542bd3357b46c107a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dd: {fileID: 1039481045}
-  emgIndex: 030000000400000005000000
+  dataDiagramObject: {fileID: 1039481045}
+  muscleChannelIndices: 030000000400000005000000
 --- !u!1 &1040006211
 GameObject:
   m_ObjectHideFlags: 0
@@ -35708,7 +35708,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: showViz
+      value: ToggleVisualization
       objectReference: {fileID: 0}
     - target: {fileID: 8434824762051719496, guid: f4ae769ba4a46d84c9e04c6914423ca2, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -36571,8 +36571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24625d348f94c8542bd3357b46c107a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dd: {fileID: 1567586560}
-  emgIndex: 000000000100000002000000
+  dataDiagramObject: {fileID: 1567586560}
+  muscleChannelIndices: 000000000100000002000000
 --- !u!114 &1567586563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38282,9 +38282,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggleButtonPrefab: {fileID: 6039803427268077161, guid: e959fc181c1f8a34893ea5807abb573a, type: 3}
   scrollViewContent: {fileID: 1792268252}
-  serverCylinder: {fileID: 816450606}
+  serverSelectionPanel: {fileID: 816450606}
   statusText: {fileID: 1934055858}
-  serverButtons:
+  serverActionButtons:
   - {fileID: 1934080660}
   - {fileID: 158887336}
   - {fileID: 2089362028}
@@ -38302,15 +38302,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphPanel: {fileID: 324590355}
-  textMVICPanel: {fileID: 1277918185}
-  textMVIC:
+  mvicTextPanel: {fileID: 1277918185}
+  mvicTextFields:
   - {fileID: 2096426524}
   - {fileID: 1653595557}
   - {fileID: 1457867460}
   - {fileID: 481319588}
   - {fileID: 423994224}
   - {fileID: 1658659894}
-  client: {fileID: 1652840846}
+  mvicClient: {fileID: 1652840846}
   graphControllers:
   - {fileID: 1567586562}
   - {fileID: 1039481051}
@@ -38326,9 +38326,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba4531204a864e14daf9e667fa36731f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  progressBar: {fileID: 1874612552}
-  graph: {fileID: 324590355}
-  avatar: {fileID: 308116774}
+  progressBarPanel: {fileID: 1874612552}
+  graphPanel: {fileID: 324590355}
+  avatarObject: {fileID: 308116774}
 --- !u!114 &1652840846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45104,9 +45104,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1652840843}
         m_TargetAssemblyTypeName: ServerController, Assembly-CSharp
-        m_MethodName: UpdateServers
+        m_MethodName: RefreshServerList
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -48684,7 +48684,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1652840843}
         m_TargetAssemblyTypeName: ServerController, Assembly-CSharp
         m_MethodName: DisconnectOnClick
         m_Mode: 1

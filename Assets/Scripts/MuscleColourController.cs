@@ -3,85 +3,102 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls the color of muscle materials on the avatar based on real-time EMG data.
+/// Colors are updated according to the RMS EMG value normalized by MVIC for each muscle.
+/// </summary>
 public class MuscleColourController : MonoBehaviour
 {
-    public GameObject avatar;
+    [Header("Avatar Reference")]
+    public GameObject avatar; // The avatar GameObject with SkinnedMeshRenderer
+
     /// <summary>
-    /// Muscles Material Index
-    /// 3 L_Scapular_part_of_deltoid_Pbr
-    /// 4 L_Clavicular_part_of_deltoid_Pbr
-    /// XX5 L_Clavicular_head_of_pectoralis_Pbr
-    /// 6 L_Acromial_part_of_deltoid_Pbr
-    /// 
-    /// 10 R_Scapular_part_of_deltoid_Pbr
-    /// 11 R_Clavicular_part_of_deltoid_Pbr
-    /// XX12 R_Clavicular_head_of_pectoralis_Pbr
-    /// 13 R_Acromial_part_of_deltoid_Pbr
+    /// Muscle Material Index Mapping:
+    ///  3  L_Scapular_part_of_deltoid_Pbr      (Posterior, Left)
+    ///  4  L_Clavicular_part_of_deltoid_Pbr    (Anterior, Left)
+    ///  6  L_Acromial_part_of_deltoid_Pbr      (Medius, Left)
+    /// 10  R_Scapular_part_of_deltoid_Pbr      (Posterior, Right)
+    /// 11  R_Clavicular_part_of_deltoid_Pbr    (Anterior, Right)
+    /// 13  R_Acromial_part_of_deltoid_Pbr      (Medius, Right)
     /// </summary>
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
+    // Called once per frame
     void Update()
     {
-        GetEmgData();
+        UpdateMuscleColors();
     }
 
-    private void GetEmgData()
+    /// <summary>
+    /// Updates the color of each muscle material on the avatar based on EMG data.
+    /// </summary>
+    private void UpdateMuscleColors()
     {
         if (RTClient.GetInstance().ConnectionState == RTConnectionState.Connected)
         {
             try
             {
-                var matCounter = 0;
-                foreach (var mat in avatar.GetComponent<SkinnedMeshRenderer>().materials)
+                var materialIndex = 0;
+                var meshRenderer = avatar.GetComponent<SkinnedMeshRenderer>();
+                var materials = meshRenderer.materials;
+
+                foreach (var material in materials)
                 {
-                    switch (mat.name)
+                    // Set color based on muscle and EMG data
+                    switch (material.name)
                     {
-                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // 3 Posterior
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(0, 0, 255, MuscleValuesRepo.rmsEmgData[0] / MuscleValuesRepo.MVIC[0]);
+                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // Left Posterior
+                            materials[materialIndex].color =
+                                new Color(0, 0, 1, GetNormalizedEmgValue(0)); // Blue
                             break;
 
-                        case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // 4 Anterior
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[1] / MuscleValuesRepo.MVIC[1]);
+                        case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // Left Anterior
+                            materials[materialIndex].color =
+                                new Color(1, 0, 0, GetNormalizedEmgValue(1)); // Red
                             break;
 
-                        case "L_Acromial_part_of_deltoid_Pbr (Instance)": // 6 Medius
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(0, 255, 0, MuscleValuesRepo.rmsEmgData[2] / MuscleValuesRepo.MVIC[2]);
+                        case "L_Acromial_part_of_deltoid_Pbr (Instance)": // Left Medius
+                            materials[materialIndex].color =
+                                new Color(0, 1, 0, GetNormalizedEmgValue(2)); // Green
                             break;
 
-                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // 10 Posterior
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(0, 0, 255, MuscleValuesRepo.rmsEmgData[3] / MuscleValuesRepo.MVIC[3]);
+                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // Right Posterior
+                            materials[materialIndex].color =
+                                new Color(0, 0, 1, GetNormalizedEmgValue(3)); // Blue
                             break;
 
-                        case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // 11 Anterior
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(255, 0, 0, MuscleValuesRepo.rmsEmgData[4] / MuscleValuesRepo.MVIC[4]);
+                        case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // Right Anterior
+                            materials[materialIndex].color =
+                                new Color(1, 0, 0, GetNormalizedEmgValue(4)); // Red
                             break;
 
-                        case "R_Acromial_part_of_deltoid_Pbr (Instance)": // 13 Medius
-                            avatar.GetComponent<SkinnedMeshRenderer>().materials[matCounter].color =
-                                new Color(0, 255, 0, MuscleValuesRepo.rmsEmgData[5] / MuscleValuesRepo.MVIC[5]);
+                        case "R_Acromial_part_of_deltoid_Pbr (Instance)": // Right Medius
+                            materials[materialIndex].color =
+                                new Color(0, 1, 0, GetNormalizedEmgValue(5)); // Green
                             break;
 
                         default:
+                            // No color update for other materials
                             break;
                     }
-                    matCounter++;
+                    materialIndex++;
                 }
             }
             catch (System.Exception)
             {
-                print("Couldn't get muscle data");
+                Debug.LogWarning("Couldn't get muscle data");
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the normalized EMG value (RMS/MVIC) for the given muscle index.
+    /// </summary>
+    /// <param name="muscleIndex">Index of the muscle channel</param>
+    /// <returns>Normalized EMG value (float)</returns>
+    private float GetNormalizedEmgValue(int muscleIndex)
+    {
+        // Prevent division by zero
+        float mvic = MuscleValuesRepo.mvicValues[muscleIndex];
+        return mvic > 0 ? MuscleValuesRepo.rmsEmgValues[muscleIndex] / mvic : 0f;
     }
 }

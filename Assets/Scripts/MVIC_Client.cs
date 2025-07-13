@@ -1,12 +1,11 @@
 /*
- * FloatArrayClient.cs
+ * MVIC_Client.cs
  * Attach this to any GameObject in your scene.
  *
- * • GetValues()  ? coroutine that calls /api/values   (GET)   and returns float[ ]
- * • SendValues() ? coroutine that calls /api/values/i (PUT)   for every element
+ * - GetMVICValues()  : Coroutine that calls /api/values   (GET)   and returns float[]
+ * - SendMVICValues() : Coroutine that calls /api/values/i (PUT)   for every element
  *
- * The Node server script from our previous steps must be running on the same
- * machine (or adjust serverBaseUrl to point to it on the LAN).
+ * The Node server script must be running on the same machine (or adjust mvicServerBaseUrl for LAN).
  */
 
 using System;
@@ -18,56 +17,62 @@ using UnityEngine.Networking;
 
 public class MVIC_Client : MonoBehaviour
 {
-    private string serverBaseUrl = EndPoints.MVIC_ServerEndpoint;
+    // Base URL for the MVIC server endpoint
+    private string mvicServerBaseUrl = EndPoints.MVICServerUrl;
 
-    // -----------------------------------------------------------------------
-    // 1. READ the 6 MVIC Values  -------------------------------------------------
-    // -----------------------------------------------------------------------
-    public IEnumerator GetValues(Action<float[]> onSuccess, Action<string> onError = null)
+    /// <summary>
+    /// Coroutine: Reads all 6 MVIC values from the server.
+    /// </summary>
+    /// <param name="onSuccess">Callback with float[] result</param>
+    /// <param name="onError">Callback with error message</param>
+    public IEnumerator GetMVICValues(Action<float[]> onSuccess, Action<string> onError = null)
     {
-        using UnityWebRequest req = UnityWebRequest.Get($"{serverBaseUrl}/api/values");
-        yield return req.SendWebRequest();
+        using UnityWebRequest request = UnityWebRequest.Get($"{mvicServerBaseUrl}/api/values");
+        yield return request.SendWebRequest();
 
-        if (req.result != UnityWebRequest.Result.Success)
+        if (request.result != UnityWebRequest.Result.Success)
         {
-            onError?.Invoke(req.error);
+            onError?.Invoke(request.error);
             yield break;
         }
 
-        float[] data = ParseFloatArray(req.downloadHandler.text);
-        onSuccess?.Invoke(data);
+        float[] mvicValues = ParseFloatArray(request.downloadHandler.text);
+        onSuccess?.Invoke(mvicValues);
     }
 
-    // -----------------------------------------------------------------------
-    // 2. SEND a new 6-MVIC Values  -----------------------------------------
-    // -----------------------------------------------------------------------
-    public IEnumerator SendValues(float[] values,
-                                  Action onSuccess = null,
-                                  Action<string> onError = null)
+    /// <summary>
+    /// Coroutine: Sends new MVIC values to the server (updates each index individually).
+    /// </summary>
+    /// <param name="mvicValues">Array of 6 MVIC float values</param>
+    /// <param name="onSuccess">Callback on success</param>
+    /// <param name="onError">Callback with error message</param>
+    public IEnumerator SendMVICValues(float[] mvicValues,
+                                      Action onSuccess = null,
+                                      Action<string> onError = null)
     {
-        if (values == null || values.Length != 6)
+        if (mvicValues == null || mvicValues.Length != 6)
         {
-            onError?.Invoke("Array must contain exactly 6 floats.");
+            onError?.Invoke("MVIC array must contain exactly 6 floats.");
             yield break;
         }
 
         // The Node API updates one index at a time: PUT /api/values/:idx
-        for (int i = 0; i < values.Length; i++)
+        for (int i = 0; i < mvicValues.Length; i++)
         {
-            string url = $"{serverBaseUrl}/api/values/{i}";
-            string body = $"{{\"value\":{values[i].ToString(CultureInfo.InvariantCulture)}}}";
-            byte[] raw = Encoding.UTF8.GetBytes(body);
+            string url = $"{mvicServerBaseUrl}/api/values/{i}";
+            string jsonBody = $"{{\"value\":{mvicValues[i].ToString(CultureInfo.InvariantCulture)}}}";
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
 
-            using UnityWebRequest req = new UnityWebRequest(url, "PUT");
-            req.uploadHandler = new UploadHandlerRaw(raw);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
+            using UnityWebRequest request = new UnityWebRequest(url, "PUT");
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
 
-            yield return req.SendWebRequest();
+            yield return request.SendWebRequest();
 
-            if (req.result != UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                onError?.Invoke($"Index {i} failed ? {req.error}");
+                onError?.Invoke($"Index {i} failed: {request.error}");
                 yield break;
             }
         }
@@ -75,9 +80,11 @@ public class MVIC_Client : MonoBehaviour
         onSuccess?.Invoke();
     }
 
-    // -----------------------------------------------------------------------
-    // Helper: quick ‘[x,x,…]’ ? float[ ] parser (no external JSON lib needed)
-    // -----------------------------------------------------------------------
+    /// <summary>
+    /// Helper: Parses a JSON float array string (e.g. "[1.0,2.0,...]") into a float[].
+    /// </summary>
+    /// <param name="json">JSON array string</param>
+    /// <returns>Parsed float array</returns>
     private static float[] ParseFloatArray(string json)
     {
         json = json.Trim().TrimStart('[').TrimEnd(']');
