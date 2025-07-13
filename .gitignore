@@ -71,3 +71,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /MVIC_Server/node_modules
+MVIC_Server/mvic_server.exe
