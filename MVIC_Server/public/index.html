@@ -10,7 +10,7 @@
   <link href="./tailwind.min.css" rel="stylesheet">
 
   <style>
-    /* subtle fade-in after first data load */
+    /* Subtle fade-in after first data load */
     body {
       opacity: 0;
       transition: opacity .4s ease;
@@ -24,52 +24,48 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-8">
 
-  <!-- ------------------------------------------------ title -->
+  <!-- ---------------------- Page Title ---------------------------- -->
   <h1 class="text-3xl font-semibold mb-8 text-center w-full">
     Shoulder&nbsp;MVIC&nbsp;Editor
   </h1>
 
-  <!-- -------------------- participant-ID selector -->
+  <!-- ------------------- Participant ID Selector ------------------ -->
   <div class="mb-10 flex flex-wrap items-center gap-3">
-    <label for="pid" class="font-medium">Participant&nbsp;ID:</label>
-
-    <input id="pid" type="text" value="001" class="border rounded-lg p-2 w-32 focus:ring-2 focus:ring-blue-500">
-
-    <button id="loadId" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition">
+    <label for="participantIdInput" class="font-medium">Participant&nbsp;ID:</label>
+    <input id="participantIdInput" type="text" value="001" class="border rounded-lg p-2 w-32 focus:ring-2 focus:ring-blue-500">
+    <button id="loadParticipantBtn" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition">
       Load
     </button>
   </div>
 
-  <!-- -------------- main two-column layout (grid + image) -->
+  <!-- ----------- Main Layout: Muscle Grid & Anatomy Image ---------- -->
   <div class="w-full max-w-6xl mx-auto flex flex-col lg:flex-row lg:items-start gap-12">
 
-    <!-- ---------------- LEFT : grid + buttons -->
+    <!-- ---------------- LEFT: Muscle Value Grid & Actions ---------- -->
     <div class="flex-1">
 
-      <!-- muscle input grid -->
-      <div id="vals" class="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- headings stay permanently; JS adds cards afterwards -->
+      <!-- Muscle input grid -->
+      <div id="muscleGrid" class="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Permanent headings; JS adds muscle cards below -->
         <h2 class="text-center font-medium text-xl">Left Shoulder</h2>
         <h2 class="text-center font-medium text-xl">Right Shoulder</h2>
       </div>
 
-      <!-- action buttons -->
+      <!-- Action buttons -->
       <div class="mt-12 flex flex-wrap justify-center lg:justify-center gap-6">
-        <button id="saveAll" class="px-6 py-2 rounded-2xl shadow bg-blue-600 text-white hover:bg-blue-700 transition">
+        <button id="saveAllBtn" class="px-6 py-2 rounded-2xl shadow bg-blue-600 text-white hover:bg-blue-700 transition">
           Save All
         </button>
-
-        <button id="resetAll" class="px-6 py-2 rounded-2xl shadow bg-red-500 text-white hover:bg-red-600 transition">
+        <button id="resetAllBtn" class="px-6 py-2 rounded-2xl shadow bg-red-500 text-white hover:bg-red-600 transition">
           Reset to 1
         </button>
       </div>
     </div>
 
-    <!-- ---------------- RIGHT : anatomy image -->
+    <!-- ---------------- RIGHT: Anatomy Image ----------------------- -->
     <div class="flex-shrink-0 lg:self-center">
       <img src="./shoulder_anatomy.jpg" alt="Shoulder muscle anatomy" class="w-full max-w-sm rounded-xl shadow">
-
-      <!-- image credit -->
+      <!-- Image credit -->
       <p class="mt-2 text-xs text-center text-gray-500">
         Image credit:&nbsp;
         <a href="https://www.bodybuildingmealplan.com/" target="_blank" class="underline">
@@ -78,108 +74,106 @@
       </p>
     </div>
 
-    <!-- ------------------------------------------------ JavaScript -->
+    <!-- ---------------------- JavaScript Logic --------------------- -->
     <script>
-      /* -------------------------- setup --------------------------- */
-      const container = document.getElementById("vals");
-      const saveAllBtn = document.getElementById("saveAll");
-      const resetAllBtn = document.getElementById("resetAll");
-      const idInput = document.getElementById("pid");
-      const loadBtn = document.getElementById("loadId");
+      // ----------- DOM Elements -----------
+      const muscleGrid = document.getElementById("muscleGrid");
+      const saveAllBtn = document.getElementById("saveAllBtn");
+      const resetAllBtn = document.getElementById("resetAllBtn");
+      const participantIdInput = document.getElementById("participantIdInput");
+      const loadParticipantBtn = document.getElementById("loadParticipantBtn");
 
-      const labels = [
+      // Muscle labels for grid cards
+      const muscleLabels = [
         "L_Deltoid_Anterior", "L_Deltoid_Medius", "L_Deltoid_Posterior",
         "R_Deltoid_Anterior", "R_Deltoid_Medius", "R_Deltoid_Posterior"
       ];
 
-      let currentId = "001";
-      let current = [];
+      let activeParticipantId = "001";
+      let currentMuscleValues = [];
 
-      /* ------------------------ render ---------------------------- */
-      function render(values) {
-        current = values;
-        // Remove everything after the two heading cells
-        while (container.children.length > 2) container.removeChild(container.lastChild);
-
-        for (let r = 0; r < 3; r++) {
-          container.appendChild(makeCard(r, labels[r], values[r]));
-          const rIdx = r + 3;
-          container.appendChild(makeCard(rIdx, labels[rIdx], values[rIdx]));
+      // ----------- Render Muscle Value Cards -----------
+      function renderMuscleGrid(values) {
+        currentMuscleValues = values;
+        // Remove all muscle cards, keep headings
+        while (muscleGrid.children.length > 2) muscleGrid.removeChild(muscleGrid.lastChild);
+        for (let i = 0; i < 3; i++) {
+          muscleGrid.appendChild(createMuscleCard(i, muscleLabels[i], values[i]));
+          muscleGrid.appendChild(createMuscleCard(i + 3, muscleLabels[i + 3], values[i + 3]));
         }
       }
 
-      function makeCard(idx, label, value) {
+      // Create a muscle value card
+      function createMuscleCard(index, label, value) {
         const card = document.createElement("div");
         card.className = "bg-white rounded-2xl shadow p-4 flex flex-col gap-2 h-full";
         card.innerHTML = `
-        <span class="font-medium">${label}</span>
-        <input type="number" step="any" value="${value}" data-idx="${idx}"
-               class="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-      `;
+          <span class="font-medium">${label}</span>
+          <input type="number" step="any" value="${value}" data-index="${index}"
+                 class="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        `;
         return card;
       }
 
-      /* --------------------- initial load ------------------------- */
-      fetch(`/api/values/${currentId}`)
-        .then(r => r.json())
-        .then(render)
+      // ----------- Initial Data Load -----------
+      fetch(`/api/values/${activeParticipantId}`)
+        .then(response => response.json())
+        .then(renderMuscleGrid)
         .finally(() => document.body.classList.add("loaded"));
 
-      /* ------------------- Load-ID button ------------------------- */
-      loadBtn.onclick = () => {
-        const newId = idInput.value.trim();
+      // ----------- Load Participant Button -----------
+      loadParticipantBtn.onclick = () => {
+        const newId = participantIdInput.value.trim();
         if (!newId) { alert("Please enter an ID"); return; }
-        currentId = newId;
-
-        fetch(`/api/current/${currentId}`, { method: "POST" });
-
-        fetch(`/api/values/${currentId}`)
-          .then(r => r.json())
-          .then(render)
+        activeParticipantId = newId;
+        fetch(`/api/current/${activeParticipantId}`, { method: "POST" });
+        fetch(`/api/values/${activeParticipantId}`)
+          .then(response => response.json())
+          .then(renderMuscleGrid)
           .catch(() => alert("Failed to load data for that ID"));
       };
 
-      /* ---------- single-field save (on blur) --------------------- */
-      container.addEventListener("blur", e => {
-        if (e.target.matches("input[data-idx]")) {
-          const idx = e.target.dataset.idx;
-          const val = parseFloat(e.target.value);
-          fetch(`/api/values/${currentId}/${idx}`, {
+      // ----------- Save Single Muscle Value on Blur -----------
+      muscleGrid.addEventListener("blur", event => {
+        if (event.target.matches("input[data-index]")) {
+          const index = event.target.dataset.index;
+          const value = parseFloat(event.target.value);
+          fetch(`/api/values/${activeParticipantId}/${index}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ value: val })
-          }).then(r => { if (!r.ok) alert("Save failed"); });
+            body: JSON.stringify({ value })
+          }).then(response => { if (!response.ok) alert("Save failed"); });
         }
       }, true);
 
-      /* ------------------- Save All button ------------------------ */
+      // ----------- Save All Muscle Values -----------
       saveAllBtn.onclick = () => {
         if (!confirm("Save ALL current values?")) return;
-        const inputs = [...container.querySelectorAll("input[data-idx]")];
-        Promise.all(inputs.map(inp =>
-          fetch(`/api/values/${currentId}/${inp.dataset.idx}`, {
+        const inputs = [...muscleGrid.querySelectorAll("input[data-index]")];
+        Promise.all(inputs.map(input =>
+          fetch(`/api/values/${activeParticipantId}/${input.dataset.index}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ value: parseFloat(inp.value) })
+            body: JSON.stringify({ value: parseFloat(input.value) })
           })
         )).then(() => alert("All values saved!"));
       };
 
-      /* ------------------ Reset button ---------------------------- */
+      // ----------- Reset All Muscle Values -----------
       resetAllBtn.onclick = () => {
         if (!confirm("Reset EVERY value to 1?")) return;
-        fetch(`/api/reset/${currentId}`, { method: "POST" })
-          .then(r => r.json())
-          .then(d => render(d.values))
+        fetch(`/api/reset/${activeParticipantId}`, { method: "POST" })
+          .then(response => response.json())
+          .then(data => renderMuscleGrid(data.values))
           .then(() => alert("All values reset!"));
       };
 
-      /* -------------------- light polling ------------------------- */
+      // ----------- Poll for Data Updates -----------
       setInterval(() => {
-        fetch(`/api/values/${currentId}`)
-          .then(r => r.json())
-          .then(d => {
-            if (JSON.stringify(d) !== JSON.stringify(current)) render(d);
+        fetch(`/api/values/${activeParticipantId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (JSON.stringify(data) !== JSON.stringify(currentMuscleValues)) renderMuscleGrid(data);
           });
       }, 1000);
     </script>
