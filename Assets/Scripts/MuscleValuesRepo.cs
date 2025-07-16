@@ -21,7 +21,7 @@ public class MuscleValuesRepo : MonoBehaviour
 
     private static int ChannelCount = 6;
     // Channel names for EMG analog input (update as needed for your setup)
-    private string[] channelNames = { "BI_EMG 1", "TRI_EMG 1", "Rest_EMG 1", "Shoulder_EMG 1", "BI_EMG 1", "TRI_EMG 1" };
+    private string[] channelNames = { "L_Deltoid_Anterior", "L_Deltoid_Medius", "L_Deltoid_Posterior", "R_Deltoid_Anterior", "R_Deltoid_Medius", "R_Deltoid_Posterior" };
 
     private int samplesCollected = 0;
     public static float SamplingInterval = 0.05f; // Time between EMG samples (seconds)

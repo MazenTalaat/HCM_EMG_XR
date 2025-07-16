@@ -8,8 +8,8 @@ using UnityEngine;
 public class EndPoints : MonoBehaviour
 {
     // Base URL for the MVIC server (used for saving and retrieving MVIC values)
-    public static string MVICServerUrl = "http://192.168.1.55:8080";
+    public static string MVICServerUrl = "http://192.168.0.115:8080";
 
     // IP address for the Qualisys Track Manager (QTM) server (used for real-time EMG streaming)
-    public static string QTMServerIp = "192.168.1.55";
+    public static string QTMServerIp = "192.168.0.101";
 }
