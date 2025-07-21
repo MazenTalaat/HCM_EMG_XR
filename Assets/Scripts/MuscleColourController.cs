@@ -46,34 +46,35 @@ public class MuscleColourController : MonoBehaviour
                     // Set color based on muscle and EMG data
                     switch (material.name)
                     {
-                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // Left Posterior
-                            materials[materialIndex].color =
-                                new Color(0, 0, 1, GetNormalizedEmgValue(0)); // Blue
-                            break;
-
+						
                         case "L_Clavicular_part_of_deltoid_Pbr (Instance)": // Left Anterior
                             materials[materialIndex].color =
-                                new Color(1, 0, 0, GetNormalizedEmgValue(1)); // Red
+                                new Color(1, 0, 0, GetNormalizedEmgValue(0)); // Red
                             break;
 
                         case "L_Acromial_part_of_deltoid_Pbr (Instance)": // Left Medius
                             materials[materialIndex].color =
-                                new Color(0, 1, 0, GetNormalizedEmgValue(2)); // Green
+                                new Color(0, 1, 0, GetNormalizedEmgValue(1)); // Green
                             break;
-
-                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // Right Posterior
+							
+                        case "L_Scapular_part_of_deltoid_Pbr (Instance)": // Left Posterior
                             materials[materialIndex].color =
-                                new Color(0, 0, 1, GetNormalizedEmgValue(3)); // Blue
+                                new Color(0, 0, 1, GetNormalizedEmgValue(2)); // Blue
                             break;
 
                         case "R_Clavicular_part_of_deltoid_Pbr (Instance)": // Right Anterior
                             materials[materialIndex].color =
-                                new Color(1, 0, 0, GetNormalizedEmgValue(4)); // Red
+                                new Color(1, 0, 0, GetNormalizedEmgValue(3)); // Red
                             break;
 
                         case "R_Acromial_part_of_deltoid_Pbr (Instance)": // Right Medius
                             materials[materialIndex].color =
-                                new Color(0, 1, 0, GetNormalizedEmgValue(5)); // Green
+                                new Color(0, 1, 0, GetNormalizedEmgValue(4)); // Green
+                            break;
+
+                        case "R_Scapular_part_of_deltoid_Pbr (Instance)": // Right Posterior
+                            materials[materialIndex].color =
+                                new Color(0, 0, 1, GetNormalizedEmgValue(5)); // Blue
                             break;
 
                         default:
