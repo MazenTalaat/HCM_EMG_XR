@@ -35,10 +35,21 @@
   <!-- ------------------- Participant ID Selector ------------------ -->
   <div class="mb-10 flex flex-wrap items-center gap-3">
     <label for="participantIdInput" class="font-medium">Participant&nbsp;ID:</label>
-    <input id="participantIdInput" type="text" value="001" class="border rounded-lg p-2 w-32 focus:ring-2 focus:ring-blue-500">
+    <input id="participantIdInput" type="text" value="001"
+      class="border rounded-lg p-2 w-32 focus:ring-2 focus:ring-blue-500">
     <button id="loadParticipantBtn" class="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition">
       Load
     </button>
+
+    <select id="muscleSelect" class="border rounded-lg p-2 ml-4 focus:ring-2 focus:ring-blue-500">
+      <option value="all">All</option>
+      <option value="0">L_Deltoid_Anterior</option>
+      <option value="1">L_Deltoid_Medius</option>
+      <option value="2">L_Deltoid_Posterior</option>
+      <option value="3">R_Deltoid_Anterior</option>
+      <option value="4">R_Deltoid_Medius</option>
+      <option value="5">R_Deltoid_Posterior</option>
+    </select>
   </div>
 
   <!-- ----------- Main Layout: Muscle Grid & Anatomy Image ---------- -->
@@ -56,7 +67,8 @@
 
       <!-- Action buttons -->
       <div class="mt-12 flex flex-wrap justify-center lg:justify-center gap-6">
-        <button id="saveAllBtn" class="px-6 py-2 rounded-2xl shadow bg-blue-600 text-white hover:bg-blue-700 transition">
+        <button id="saveAllBtn"
+          class="px-6 py-2 rounded-2xl shadow bg-blue-600 text-white hover:bg-blue-700 transition">
           Save All
         </button>
         <button id="resetAllBtn" class="px-6 py-2 rounded-2xl shadow bg-red-500 text-white hover:bg-red-600 transition">
@@ -85,6 +97,8 @@
       const resetAllBtn = document.getElementById("resetAllBtn");
       const participantIdInput = document.getElementById("participantIdInput");
       const loadParticipantBtn = document.getElementById("loadParticipantBtn");
+      const muscleSel = document.getElementById("muscleSelect");
+
 
       // Muscle labels for grid cards
       const muscleLabels = [
@@ -135,6 +149,13 @@
           .then(renderMuscleGrid)
           .catch(() => alert("Failed to load data for that ID"));
       };
+
+      /* -------- send muscle filter to server -------- */
+      muscleSel.onchange = () => {
+        fetch(`/api/current-muscle/${muscleSel.value}`, { method: "POST" });
+      };
+      // initialise filter = All
+      muscleSel.onchange();
 
       // ----------- Save Single Muscle Value on Blur -----------
       muscleGrid.addEventListener("blur", event => {

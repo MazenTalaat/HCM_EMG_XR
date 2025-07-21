@@ -81,6 +81,57 @@ public class MVIC_Client : MonoBehaviour
     }
 
     /// <summary>
+    /// Coroutine: Reads the currently-selected muscle filter from the server.
+    /// Returns -1 ? “All” (all six MVIC values are accepted).
+    /// Returns 0-5 ? Only that muscle index is being stored.
+    /// Endpoint exposed by the Node server: GET /api/current-muscle
+    /// </summary>
+    /// <param name="onSuccess">Callback with int result (-1 | 0-5)</param>
+    /// <param name="onError">Callback with error message (optional)</param>
+    public IEnumerator GetMuscleFilter(Action<int> onSuccess, Action<string> onError = null)
+    {
+        using UnityWebRequest request =
+            UnityWebRequest.Get($"{mvicServerBaseUrl}/api/current-muscle");
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.error);
+            yield break;
+        }
+
+        // ----------------------------------------------------------------
+        // Expected JSON payload: {"filter":"all"}   or   {"filter":3}
+        // We parse it with a *tiny* manual routine to avoid extra packages.
+        // ----------------------------------------------------------------
+        string json = request.downloadHandler.text.Trim();
+        int filterIndex = -1;                 // default = All
+
+        try
+        {
+            // crude but sufficient: find the ':' then trim trailing chars
+            int colon = json.IndexOf(':');
+            if (colon > 0)
+            {
+                string valuePart = json
+                    .Substring(colon + 1)
+                    .TrimEnd('}', ' ', '\n', '\r', '\t')
+                    .Trim('"');
+
+                if (valuePart != "all")
+                    int.TryParse(valuePart, out filterIndex); // becomes 0-5 if valid
+            }
+        }
+        catch
+        {
+            // keep default (-1) on any parse failure
+        }
+
+        onSuccess?.Invoke(filterIndex);
+    }
+
+
+    /// <summary>
     /// Helper: Parses a JSON float array string (e.g. "[1.0,2.0,...]") into a float[].
     /// </summary>
     /// <param name="json">JSON array string</param>
@@ -100,4 +151,5 @@ public class MVIC_Client : MonoBehaviour
         }
         return result;
     }
+
 }

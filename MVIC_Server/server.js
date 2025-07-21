@@ -24,8 +24,9 @@ const getMuscleArray = participantId =>
 const saveStore = () =>
   fs.writeFileSync(STORE_FILENAME, JSON.stringify(participantStore, null, 2));
 
-/* ------------------- Current Participant Pointer ------------------- */
+/* ------------------- Current Participant and Muscle Pointer ------------------- */
 let currentParticipantId = "001"; // Default participant on server start
+let currentMuscleFilter = "all"; // Default muscle filter on server start
 
 /* ------------------- Express App Setup ----------------------------- */
 const app = express();
@@ -67,25 +68,43 @@ app.get("/api/current", (req, res) =>
   res.json({ id: currentParticipantId })
 );
 
-/* ------------------- Unity-Fixed Endpoints ------------------------- */
-// Get muscle values for the current participant
-app.get("/api/values", (req, res) =>
-  res.json(getMuscleArray(currentParticipantId))
-);
-// Update a single muscle value for the current participant
-app.put("/api/values/:muscleIdx", (req, res) => {
-  const idx = +req.params.muscleIdx, value = +req.body.value;
-  if (!Number.isFinite(value) || idx < 0 || idx >= NUM_MUSCLES)
-    return res.status(400).end();
-  getMuscleArray(currentParticipantId)[idx] = value;
-  saveStore();
-  res.json({ ok: true });
+/* ------------------- Muscle-filter endpoint ------------------- */
+app.post("/api/current-muscle/:filter", (req, res) => {
+  const f = req.params.filter;
+  currentMuscleFilter = (f === "all") ? "all" : Number(f);
+  res.json({ ok: true, filter: currentMuscleFilter });
 });
+
 // Reset all muscle values for the current participant
 app.post("/api/reset", (req, res) => {
   participantStore[currentParticipantId] = defaultMuscleArray();
   saveStore();
   res.json({ ok: true });
+});
+
+/* ------------------- Unity-Fixed Endpoints ------------------------- */
+// Get muscle values for the current participant
+app.get("/api/values", (req, res) =>
+  res.json(getMuscleArray(currentParticipantId))
+);
+
+// Update a single muscle value for the current participant
+app.put("/api/values/:muscleIdx", (req, res) => {
+  const idx = +req.params.muscleIdx, value = +req.body.value;
+  if (!Number.isFinite(value) || idx < 0 || idx >= NUM_MUSCLES)
+    return res.status(400).end();
+  // ONLY save if filter = "all" or matches this index
+  if (currentMuscleFilter === "all" || currentMuscleFilter === idx) {
+    getMuscleArray(currentParticipantId)[idx] = value;
+    saveStore();
+  }
+  res.json({ ok: true });
+});
+
+/* ---- GET the currently-selected muscle filter ---- */
+app.get("/api/current-muscle", (req, res) => {
+  // returns { filter: "all" }  OR  { filter: 0-5 }
+  res.json({ filter: currentMuscleFilter });
 });
 
 /* ------------------- Start Server ---------------------------------- */

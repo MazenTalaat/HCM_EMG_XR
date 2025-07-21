@@ -103,14 +103,35 @@ public class MuscleValuesRepo : MonoBehaviour
                 // Update MVIC values and send to server if tracking is active
                 if (isMVICTrackingActive)
                 {
-                    for (int i = 0; i < ChannelCount; i++)
-                    {
-                        mvicValues[i] = Math.Max(mvicValues[i], rmsEmgValues[i]);
-                    }
-                    StartCoroutine(mvicClient.SendMVICValues(
-                        mvicValues.ToArray(),
-                        () => Debug.Log("MVIC PUT success"),
-                        err => Debug.LogError($"MVIC PUT failed: {err}")
+                    StartCoroutine(mvicClient.GetMuscleFilter(
+                        filter =>
+                        {
+                            if (filter == -1)
+                            {
+                                Debug.Log("Unity sees filter = ALL");
+                                for (int i = 0; i < ChannelCount; i++)
+                                {
+                                    mvicValues[i] = Math.Max(mvicValues[i], rmsEmgValues[i]);
+                                }
+                            }
+                            else
+                            {
+                                Debug.Log($"Unity sees filter for muscle {filter}");
+                                mvicValues[filter] = Math.Max(mvicValues[filter], rmsEmgValues[filter]);
+                            }
+
+                            StartCoroutine(mvicClient.SendMVICValues(
+                                mvicValues.ToArray(),
+                                () =>
+                                {
+                                    Debug.Log("MVIC PUT success");
+                                    FetchMVICFromServer();
+                                },
+                                err => Debug.LogError($"MVIC PUT failed: {err}")
+                            ));
+
+                        },
+                        err => Debug.LogError("Failed to fetch muscle filter: " + err)
                     ));
                 }
             }
