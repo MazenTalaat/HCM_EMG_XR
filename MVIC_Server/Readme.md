@@ -105,9 +105,3 @@ If the file is missing or corrupted, a new one is created automatically.
 - `public/` – Static web assets (HTML, CSS, images)
 - `values.json` – Persistent data store (auto-generated)
 - `Readme.md` – Documentation
-
----
-
-## License
-
-MIT License (see LICENSE file if present)
