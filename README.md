@@ -101,9 +101,4 @@ And follow the instructions.
   Used for real-time motion and EMG data streaming.
 - **Node.js Express**  
   Used for MVIC value persistence and web UI.
-
----
-
-## License
-
-This project is for research and educational use. See individual files for third-party licenses.
+  
