@@ -1,4 +1,4 @@
-# HCM_EMG_XR
+# A Protocol for Assessing Virtual and Mixed Reality Environments with Real-Time Electromyographic (EMG) Biofeedback During Upper Limb Physical Exercises
 
 This Unity project enables real-time streaming and visualization of electromyography (EMG) and motion-capture data in extended reality (XR) environments. It integrates with the Qualisys Track Manager (QTM) via the Qualisys Unity SDK and provides a Node.js backend for managing Maximum Voluntary Isometric Contraction (MVIC) values.
 
